@@ -1,0 +1,26 @@
+# Signing material — never commit
+*.jks
+*.keystore
+*.p12
+*.pepk
+signing.properties
+keystore.properties
+release-key*
+
+# Local machine config
+local.properties
+.gradle/
+build/
+app/build/
+*.iml
+.idea/
+captures/
+
+# Build outputs (snapshots drop these names anyway)
+dist/
+out/
+target/
+*.apk
+*.aab
+*.ap_
+*.dex

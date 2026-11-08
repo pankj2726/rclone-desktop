@@ -1,0 +1,27 @@
+HTTP/2 200 
+date: Sun, 08 Nov 2026 12:30:20 GMT
+content-type: application/json; charset=utf-8
+content-length: 3
+cf-ray: a57496a12b8fd452-SEA
+cf-cache-status: DYNAMIC
+accept-ranges: bytes
+access-control-allow-origin: *
+age: 10231
+cache-control: public, max-age=0, must-revalidate
+content-disposition: inline; filename="assetlinks.json"
+etag: "8a80554c91d9fca8acb82f023de02f11"
+last-modified: Sun, 08 Nov 2026 09:39:48 GMT
+server: cloudflare
+x-xss-protection: 1; mode=block
+strict-transport-security: max-age=15552000; includeSubDomains; preload
+expect-ct: max-age=86400, enforce
+referrer-policy: same-origin
+x-content-type-options: nosniff
+x-frame-options: SAMEORIGIN
+x-matched-path: /.well-known/assetlinks.json
+x-vercel-cache: HIT
+x-vercel-id: pdx1::hdlv7-1794141020363-3c1307d4ad42
+set-cookie: _vcrr_ec68a2456e920849=dpl_GeGyyc8RQ84C1SBTGDT2JqhjcXsF|0.0901; Path=/; Secure; HttpOnly; SameSite=None
+set-cookie: __cf_bm=h6MTc8O2a_A_UuK9dxxj8N9OJrJl0_EVVWLIUnXOHuQ-1794141020.3496325-1.0.1.1-MvnPUKjlgzw1YtbTG25N2d0tWtbSF2pudnJ9HX1ic5C82FF3sLLzZZTsPQ3Vz9wRg1zHoe.nv670LDLLQQLglT6xo.SdL7Fv46_yqwONE616Fcg66ij9MAdIgqhhqcUl; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=arena.ai; Expires=Sun, 08 Nov 2026 13:00:20 GMT
+alt-svc: h3=":443"; ma=86400
+

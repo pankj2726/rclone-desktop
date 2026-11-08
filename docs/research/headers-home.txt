@@ -1,0 +1,33 @@
+HTTP/2 200 
+date: Sun, 08 Nov 2026 12:30:15 GMT
+content-type: text/html; charset=utf-8
+cf-ray: a5749680885ce477-SEA
+cf-cache-status: DYNAMIC
+access-control-allow-origin: *
+age: 33838
+cache-control: public, max-age=0, must-revalidate
+content-disposition: inline
+link: </_next/static/immutable/media/Basel_Grotesk_Bold-s.p.2c2-3gk8njmm-.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/Basel_Grotesk_Book-s.p.1redmgbiro9ne.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/Basel_Grotesk_Medium-s.p.0x42va-c10n7b.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/Basel_Grotesk_Mono_Regular-s.p.3bkzxj4--2n-t.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/Basel_Grotesk_Regular-s.p.137aglqpo8rjk.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/martina_plantijn_light-s.p.28db7u-6s6il9.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2", </_next/static/immutable/media/martina_plantijn_light_italic-s.p.2mf57cy9vkahj.woff2>; rel=preload; as="font"; crossorigin=""; type="font/woff2"
+server: cloudflare
+x-xss-protection: 1; mode=block
+strict-transport-security: max-age=15552000; includeSubDomains; preload
+vary: rsc, next-router-state-tree, next-router-prefetch, next-router-segment-prefetch, accept-encoding
+content-security-policy: frame-ancestors 'self' https://huggingface.co/ https://*.static.hf.space/
+content-security-policy-report-only: default-src 'self'; script-src 'self' https://vercel.live https://challenges.cloudflare.com https://cdnjs.cloudflare.com https://cdn.arena.ai https://*.posthog.com https://www.googletagmanager.com https://static.cloudflareinsights.com https://www.google.com https://www.gstatic.com https://ah-cdn.merge.dev 'unsafe-inline' 'unsafe-eval'; script-src-elem 'self' https://vercel.live https://challenges.cloudflare.com https://cdnjs.cloudflare.com https://cdn.arena.ai https://*.posthog.com https://www.googletagmanager.com https://arena.ai https://static.cloudflareinsights.com/ https://www.google.com https://www.gstatic.com https://ah-cdn.merge.dev 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://vercel.live https://us.posthog.com; img-src 'self' data: blob: https://challenges.cloudflare.com https://*.posthog.com https://vercel.live https://vercel.com https://*.27c852f3500f38c1e7786e2c9ff9e48f.r2.cloudflarestorage.com https://lh3.googleusercontent.com https://*.googletagmanager.com; connect-src 'self' https://arena.ai https://vercel.live wss://ws-us3.pusher.com https://*.posthog.com https://posthog.com https://challenges.cloudflare.com https://unpkg.com/@rive-app/ https://www.google-analytics.com https://*.google-analytics.com https://www.google.com https://*.27c852f3500f38c1e7786e2c9ff9e48f.r2.cloudflarestorage.com https://browser-intake-us3-datadoghq.com https://api.trigger.dev; frame-src 'self' https://vercel.live https://challenges.cloudflare.com https://www.google.com https://*.arena.site https://*.staging.arena.site https://ah-cdn.merge.dev; font-src 'self' data: https://vercel.live https://assets.vercel.com https://*.gstatic.com; worker-src 'self' blob:
+expect-ct: max-age=86400, enforce
+referrer-policy: same-origin
+x-content-type-options: nosniff
+x-current-path: https://arena.ai/
+x-frame-options: SAMEORIGIN
+x-matched-path: /en
+x-nextjs-prerender: 1
+x-nextjs-stale-time: 300
+x-vercel-cache: HIT
+x-vercel-id: pdx1::x8pq6-1794141015288-04598ec3e7dd
+set-cookie: provisional_user_id=01a1bb23-4d10-7d97-b8d7-fd21d37d08b7; Path=/; Expires=Mon, 08 Nov 2027 12:30:15 GMT; Max-Age=31536000; Secure; HttpOnly; SameSite=lax
+set-cookie: user_country_code=US; Path=/; Secure; SameSite=lax
+set-cookie: arena_build_bucket=stable; Path=/; Secure; SameSite=lax
+set-cookie: _vcrr_ec68a2456e920849=dpl_GeGyyc8RQ84C1SBTGDT2JqhjcXsF|0.0758; Path=/; Secure; HttpOnly; SameSite=None
+set-cookie: __cf_bm=i3MvZ4hF9LU3j39HWS0ys83Orli38UK3W0Cgc6Y2M_U-1794141015.2722633-1.0.1.1-PIgsqWl45WqJ7m5X1BhZid2mHUSQvo5xzK.P67jreh2MtJhhT3wizgbtKOcI0Qm4aUdBFky9YISLpd0ZGZfVofLzpqe4pCRtHE9bEiHevFRnzfysP2db_G6G4rsGiqYl; HttpOnly; SameSite=None; Partitioned; Secure; Path=/; Domain=arena.ai; Expires=Sun, 08 Nov 2026 13:00:15 GMT
+alt-svc: h3=":443"; ma=86400
+
