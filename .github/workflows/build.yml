@@ -1,6 +1,12 @@
 name: build
 
 # P7-01 — every push and PR: compile, unit tests, lint. No signing, no secrets.
+#
+# Note on the SDK: the ubuntu-latest runner image already ships an Android SDK with
+# cmdline-tools. android-actions/setup-android@v3 was removed here because it tries to
+# install the long-deleted "tools" package and fails with exit 1 before any of our
+# steps run (observed on run 42488344472). Using the preinstalled SDK is one less
+# moving part and one less third-party action in the supply chain (R11).
 on:
   push:
     branches: [ main ]
@@ -23,13 +29,25 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install pinned build-tools and platform
+      - name: Locate the preinstalled Android SDK
         run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$SDK/platform-tools" >> "$GITHUB_PATH"
+          echo "$SDK/build-tools/36.0.0" >> "$GITHUB_PATH"
+          echo "sdk root: $SDK"
+          ls "$SDK" 2>/dev/null || echo "no SDK dir at $SDK"
+
+      - name: Install pinned platform and build-tools
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
           sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "platform-tools"
-          yes | sdkmanager --licenses > /dev/null || true
+          echo "--- installed ---"
+          sdkmanager --list_installed 2>/dev/null | head -20
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -45,10 +63,12 @@ jobs:
 
       - name: Report merged manifest (P6-07)
         run: |
-          AAPT=$(ls "$ANDROID_HOME"/build-tools/36.0.0/aapt2)
-          "$AAPT" dump xmltree --file AndroidManifest.xml app/build/outputs/apk/debug/app-debug.apk \
-            > merged-manifest.txt || true
-          grep -c "uses-permission" merged-manifest.txt || echo "0 permissions"
+          set -uo pipefail
+          APK=app/build/outputs/apk/debug/app-debug.apk
+          AAPT="$ANDROID_HOME/build-tools/36.0.0/aapt2"
+          "$AAPT" dump xmltree --file AndroidManifest.xml "$APK" > merged-manifest.txt || true
+          printf 'permissions declared: %s\n' "$(grep -c 'uses-permission' merged-manifest.txt || true)"
+          grep -E 'exported|activity' merged-manifest.txt | head -10 || true
 
       - name: Upload artifacts
         uses: actions/upload-artifact@v4

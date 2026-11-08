@@ -18,3 +18,5 @@ before work starts.
 
 | D-11 | Default branch is `main`, and the bundle is built from it | Found by cloning the bundle: `git clone` of a `master` repo produced `master`, while every workflow triggers on `main`. A push would have created a default branch no CI listens to | implemented |
 | D-12 | `artifacts/*.bundle` and `artifacts/*.zip` are git-ignored | Committing a bundle puts the previous bundle inside the new one; the repository grows recursively on every commit. `artifacts/` is snapshotted, `dist`/`build`/`out` are not, so they belong on disk and out of history | implemented |
+
+| D-13 | CI uses the runner's preinstalled Android SDK; `android-actions/setup-android` removed | First CI run (42488344472) failed inside that action: it runs `sdkmanager tools`, and the `tools` package no longer exists, so it exits 1 before any of our steps. Fewer third-party actions is also better for R11 | implemented |
