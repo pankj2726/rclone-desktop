@@ -194,3 +194,21 @@ Two things worth keeping:
    permanently-empty query and a correct answer look identical. Only installing Chrome
    separated them. The same trap applies to any check that is trivially true in the test
    environment.
+
+## D-31 — No TWA-capability probe; state the limitation instead
+
+A second attempt at detecting whether the device can host a Trusted Web Activity - this time
+querying *activities* for `androidx.browser.trusted.category.TrustedWebActivities` - also
+returned nothing on a device with Chrome 156 installed. The cause is Android 11+ package
+visibility: an app cannot enumerate another package's components unless its manifest declares
+a matching `<queries>` entry, and matching Chrome's internal intent filter would mean guessing
+at Chromium's action name. Guessing wrong produces a confident, false message, which is worse
+than no message.
+
+So the probe is gone. The gate states the one thing that is true on every device today: Arena
+has not verified this app, so the browser toolbar stays visible. When Arena publishes
+`assetlinks.json` and `autoVerify` can be switched on (S3-02), this notice becomes false and
+must be removed at the same time - noted here so the two changes stay together.
+
+Diagnostics no longer reports a browser capability either, for the same reason: it would have
+said "none" on a device with Chrome.

@@ -106,15 +106,15 @@ public class LaunchGateActivity extends Activity {
         // A TWA needs a browser that declares the TrustedWebActivities category. Without
         // one the library degrades to a Custom Tab, which is a browser tab with a URL bar
         // rather than the app-like experience. Say so once instead of degrading silently.
+        // The browser toolbar is visible whenever Arena has not published an assetlinks.json
+        // entry for this package, which is the case today regardless of what browser is
+        // installed. Say that once per launch instead of guessing which browser is present:
+        // Android 11+ package visibility makes a TWA-capability probe unreliable without
+        // declaring queries for Chrome's internal intent, and a wrong probe produced a false
+        // "Chrome is not installed" on a device where Chrome was installed (D-30).
         if (!proceedingWithoutTwa) {
-            if (!TwaProviderCheck.isProviderInstalled(this)) {
-                showFallbackNotice(R.string.gate_no_browser_twa);
-                return;
-            }
-            if (TwaProviderCheck.toolbarAlwaysVisible()) {
-                showFallbackNotice(R.string.gate_no_twa_notice);
-                return;
-            }
+            showNotice(R.string.gate_toolbar_notice);
+            return;
         }
 
         // IN_APP: hand to the Trusted Web Activity launcher, which re-validates.
@@ -139,9 +139,8 @@ public class LaunchGateActivity extends Activity {
      * browser tab deliberately. Re-checked on every launch, so installing Chrome later
      * takes effect without clearing app data.
      */
-    private void showFallbackNotice(int message) {
-        Log.i(TAG, "routing notice shown; provider=" + TwaProviderCheck.providerPackage(this)
-                + " twaAvailable=" + TwaProviderCheck.isProviderInstalled(this));
+    private void showNotice(int message) {
+        Log.i(TAG, "routing notice shown before first load");
         status.setText(message);
         status.setVisibility(View.VISIBLE);
         Button retry = findViewById(R.id.gate_retry);

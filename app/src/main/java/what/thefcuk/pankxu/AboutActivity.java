@@ -85,9 +85,6 @@ public class AboutActivity extends Activity {
         sb.append("device: ").append(Build.MANUFACTURER).append(' ').append(Build.MODEL).append('\n');
         sb.append("abi: ").append(Build.SUPPORTED_ABIS.length > 0 ? Build.SUPPORTED_ABIS[0] : "?")
                 .append('\n');
-        sb.append("twa provider: ").append(TwaProviderCheck.providerPackage(this)).append('\n');
-        sb.append("twa available: ").append(TwaProviderCheck.isProviderInstalled(this))
-                .append('\n');
         sb.append("privacy: ").append(PRIVACY_URL).append('\n');
         return sb.toString();
     }
