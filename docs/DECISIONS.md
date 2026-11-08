@@ -53,3 +53,36 @@ of error as writing verification checksums by hand.
 committed in `9fdf48d` and build 42500268168 stayed green. A deliberate checksum corruption in
 `79fc7da` failed run 42500469892 with `DependencyVerificationException`, which is the evidence
 that the file is enforced rather than ignored; the corruption was reverted in `19af292`.
+
+## D-23 — Declare `ManageDataLauncherActivity`, keep `LauncherActivity`, and assert the manifest in CI
+
+**The bug.** The first device run crashed before showing anything:
+
+```
+java.lang.RuntimeException: Unable to start activity ... PankxuLauncherActivity:
+  java.lang.IllegalArgumentException: Component class
+  com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity does not exist
+      at LauncherActivity.launchTwa(LauncherActivity.java:264)
+```
+
+Unpacking the published 2.7.4 AAR shows the class is present in `classes.jar` but the
+library's own `AndroidManifest.xml` declares only `ShortcutTrampolineActivity` and
+`ColdShortcutActivity`. `LauncherActivity.launchTwa()` builds a `ComponentName` for
+`ManageDataLauncherActivity` and requires it to resolve, so the declaring app has to add it.
+Compilation, lint, unit tests, the SBOM and dependency verification all pass without it —
+they cannot see a component that only matters at runtime.
+
+**Decision.** Declare the activity, `android:exported="false"`, with no intent filter and no
+`MANAGE_SPACE_URL` metadata. Declaring it is the documented contract; the app never launches
+it. Migration to the `TwaLauncher` API (which does not need it) is rejected for now: it moves
+splash-screen and fallback handling into our code, which is a larger change than the bug
+warrants, and D-16 wants the maintained fallback chain.
+
+**Guard.** `scripts/check-manifest.py` asserts the four required activities and their export
+states plus the permission set, and fails the build if any of them drifts. Run against the
+manifest from the crashing build it fails with exactly the missing component; the shipped
+build passes. Runtime-only contracts now have a build-time test.
+
+**Honest note.** This bug existed in every release so far, including `v1.0.0-debug` and
+`v1.0.0-unsigned`. None of them would have launched. The docs claiming "built, not yet
+verified" were accurate, and this is what verification buys.

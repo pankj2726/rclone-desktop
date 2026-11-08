@@ -80,6 +80,9 @@ jobs:
           printf 'permissions declared: %s\n' "$(grep -c 'uses-permission' merged-manifest.txt || true)"
           grep -E 'exported|activity' merged-manifest.txt | head -10 || true
 
+      - name: Check manifest contract (regression guard)
+        run: python3 scripts/check-manifest.py merged-manifest.txt
+
       - name: Generate SBOM (P6-06)
         run: |
           set -euo pipefail

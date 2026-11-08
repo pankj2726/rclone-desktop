@@ -87,5 +87,24 @@
 
         </activity>
 
+        <!--
+          Required by androidbrowserhelper 2.7.4, and the reason the first device
+          run crashed. LauncherActivity.launchTwa() does
+          `new ComponentName(this, ManageDataLauncherActivity.class)` and throws
+          IllegalArgumentException if that component is not in the merged
+          manifest. The library ships the class but does not declare it in its own
+          manifest - verified by unpacking the published AAR - so every app that
+          uses LauncherActivity has to declare it. See
+          docs/qa-evidence/device-2026-11-08/03-crash-stacktrace.txt.
+
+          It backs the browser's "Manage data" affordance and is never launched by
+          this app, so it needs no intent filter. It carries no MANAGE_SPACE_URL
+          metadata: if something did launch it, the library shows a
+          "not supported" toast instead of doing anything.
+        -->
+        <activity
+            android:name="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity"
+            android:exported="false" />
+
     </application>
 </manifest>
