@@ -75,7 +75,10 @@ jobs:
             exit 1
           fi
           ls -l "$PANKXU_KEYSTORE_PATH"
-          ./gradlew --no-daemon -q :app:signingReport 2>&1 | sed -n '1,60p'
+          # Write to a file first: piping gradle into head kills it with SIGPIPE and, under
+          # `set -o pipefail`, fails the step for no real reason (seen in run 42512920581).
+          ./gradlew --no-daemon -q :app:signingReport > signing-report.txt 2>&1 || true
+          grep -A4 "^Variant: release" signing-report.txt || true
 
       - name: Build release
         env:
