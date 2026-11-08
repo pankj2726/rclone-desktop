@@ -53,6 +53,9 @@ public class LaunchGateActivity extends Activity {
         status = findViewById(R.id.gate_status);
         Button retry = findViewById(R.id.gate_retry);
         retry.setOnClickListener(v -> proceed());
+        Button about = findViewById(R.id.gate_about);
+        about.setOnClickListener(v ->
+                startActivity(new Intent(LaunchGateActivity.this, AboutActivity.class)));
         maybeShowDisclosureThenProceed();
     }
 

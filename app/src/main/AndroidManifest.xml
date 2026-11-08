@@ -87,6 +87,20 @@
 
         </activity>
 
+        <!-- S2-04: reached from the gate. Not exported: nothing outside the app should be
+             able to open a screen that can export diagnostics. -->
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false"
+            android:label="@string/gate_about"
+            android:theme="@style/Theme.Pankxu" />
+
+        <activity
+            android:name=".LicensesActivity"
+            android:exported="false"
+            android:label="@string/about_licenses"
+            android:theme="@style/Theme.Pankxu" />
+
         <!--
           Required by androidbrowserhelper 2.7.4, and the reason the first device
           run crashed. LauncherActivity.launchTwa() does

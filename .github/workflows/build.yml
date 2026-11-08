@@ -83,6 +83,9 @@ jobs:
       - name: Check manifest contract (regression guard)
         run: python3 scripts/check-manifest.py merged-manifest.txt
 
+      - name: Check licence text is in sync (S2-04)
+        run: python3 scripts/check-notices.py
+
       - name: Check shortcut targets match the built package
         run: |
           set -euo pipefail

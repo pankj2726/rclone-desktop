@@ -22,6 +22,9 @@ REQUIRED_ACTIVITIES = {
     "what.thefcuk.pankxu.PankxuLauncherActivity": False,
     "com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity": False,
     "com.google.androidbrowserhelper.trusted.ShortcutTrampolineActivity": True,
+    # S2-04 screens: in-app only, nothing outside may open them.
+    "what.thefcuk.pankxu.AboutActivity": False,
+    "what.thefcuk.pankxu.LicensesActivity": False,
 }
 
 FORBIDDEN_PERMISSIONS = {"android.permission.INTERNET"}

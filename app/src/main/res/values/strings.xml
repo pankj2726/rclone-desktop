@@ -33,6 +33,19 @@ This app collects nothing. Use test prompts containing no personal data while ev
     <string name="gate_checking">Opening arena.ai…</string>
     <string name="gate_no_twa_notice">Chrome is not installed, so arena.ai opens in a browser tab instead of full screen. Install Chrome to get the app-like view.</string>
     <string name="gate_continue">Continue in browser</string>
+    <string name="gate_about">About</string>
+
+    <!-- S2-04 / X-01..X-03: About screen -->
+    <string name="about_version_format">Version %1$s (%2$d)</string>
+    <string name="about_research_body">Arena states in its own FAQ that prompts sent in Side-by-Side and Direct modes are collected for research, that those modes do not count as leaderboard votes, and that publicly shared or provider-shared data is de-identified. Your chats are governed by Arena\'s privacy policy, not by this app.</string>
+    <string name="about_collects_nothing">This app collects no personal data and sends nothing anywhere on its own.</string>
+    <string name="about_privacy">Arena privacy policy</string>
+    <string name="about_open_browser">Open arena.ai in the browser</string>
+    <string name="about_licenses">Open-source licences</string>
+    <string name="about_licenses_unavailable">Licence text could not be read.</string>
+    <string name="about_diagnostics">Share diagnostics</string>
+    <string name="about_diagnostics_note">Builds a short text report (version, Android version, device model, browser provider) and hands it to whatever app you choose. Nothing is sent automatically and no Arena content is included.</string>
+    <string name="about_diagnostics_subject">Pankxu diagnostics</string>
 
     <string name="shortcut_disabled_battle">Battle: route not published on arena.ai; shortcut withheld</string>
 </resources>
