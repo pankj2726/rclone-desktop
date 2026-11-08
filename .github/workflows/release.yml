@@ -76,13 +76,38 @@ jobs:
         run: |
           set -euo pipefail
           BT="$ANDROID_HOME/build-tools/36.0.0"
-          APK=$(ls app/build/outputs/apk/release/*.apk | head -1)
+          echo "--- release output directory ---"
+          ls -l app/build/outputs/apk/release/
+          # The signed artifact is app-release.apk. app-release-unsigned.apk exists only when
+          # no signing config was applied, and picking it silently is how a pipeline publishes
+          # an unsigned "release" (observed in run 42512509749: the first glob match was the
+          # unsigned file, and apksigner reported Missing META-INF/MANIFEST.MF).
+          APK=app/build/outputs/apk/release/app-release.apk
+          if [ ! -f "$APK" ]; then
+            echo "::error::no signed APK at $APK - the signing config did not apply."
+            echo "Files present:"; ls -l app/build/outputs/apk/release/ || true
+            exit 1
+          fi
           echo "APK=$APK" >> "$GITHUB_ENV"
           "$BT/zipalign" -c -P 16 -v 4 "$APK" | tail -3
-          "$BT/apksigner" verify --verbose --print-certs "$APK" | tee signature.txt
+          "$BT/apksigner" verify --min-sdk-version 26 --verbose --print-certs "$APK" | tee signature.txt
           "$BT/aapt2" dump badging "$APK" | tee badging.txt
           grep -q "Verified using v2 scheme (APK Signature Scheme v2): true" signature.txt
           grep -q "Verified using v3 scheme (APK Signature Scheme v3): true" signature.txt
+          # R14/X-19: the certificate must be the one whose fingerprint we published.
+          EXPECTED_SHA256="$(grep -oE '^[[:space:]]*[0-9A-F:]{95}$' docs/key-fingerprint.txt | tr -d ' ')"
+          if [ -z "$EXPECTED_SHA256" ]; then
+            echo "::error::could not read the expected fingerprint from docs/key-fingerprint.txt"
+            exit 1
+          fi
+          ACTUAL_SHA256="$(grep -oE 'Signer #1 certificate SHA-256 digest: [0-9a-f]+' signature.txt | awk '{print $NF}' | tr 'a-f' 'A-F' | sed 's/../&:/g;s/:$//')"
+          echo "expected: $EXPECTED_SHA256"
+          echo "actual:   $ACTUAL_SHA256"
+          if [ "$EXPECTED_SHA256" != "$ACTUAL_SHA256" ]; then
+            echo "::error::certificate fingerprint does not match docs/key-fingerprint.txt"
+            exit 1
+          fi
+          echo "certificate matches the published fingerprint"
 
       - name: Checksums and SBOM
         run: |
