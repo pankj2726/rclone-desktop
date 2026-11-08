@@ -80,6 +80,14 @@ jobs:
           printf 'permissions declared: %s\n' "$(grep -c 'uses-permission' merged-manifest.txt || true)"
           grep -E 'exported|activity' merged-manifest.txt | head -10 || true
 
+      - name: Generate SBOM (P6-06)
+        run: |
+          set -euo pipefail
+          ./gradlew --no-daemon -q -I scripts/sbom.init.gradle :app:sbomCoordinates > coordinates.txt
+          printf 'resolved components: %s\n' "$(grep -c '^COORD' coordinates.txt || true)"
+          python3 scripts/make-sbom.py coordinates.txt sbom.cdx.json
+          python3 -c "import json;d=json.load(open('sbom.cdx.json'));print('cyclonedx', d['specVersion'], len(d['components']), 'components')"
+
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -89,3 +97,5 @@ jobs:
             app/build/reports/lint-results-debug.html
             app/build/reports/tests/testDebugUnitTest/
             merged-manifest.txt
+            sbom.cdx.json
+            coordinates.txt

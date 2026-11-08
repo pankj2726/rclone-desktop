@@ -1,0 +1,40 @@
+PANKXU - WHICH APK TO INSTALL
+=============================
+
+Both files in this folder are the same app, built at different commits.
+
+  pankxu-1.0.0-debug-v31.apk   <-- INSTALL THIS ONE
+      Built by CI run 42499683401 (commit cb4c36a).
+      Contains the roadmap v3.1 changes: the launch gate, the one-time research
+      disclosure, the offline retry screen, browser routing for third-party
+      sign-in, and the ACCESS_NETWORK_STATE permission.
+      Size 4,916,825 bytes
+      SHA-256 d486a67c1fc87d8ed06f462761da11dc764553d6bbba9241ab9899531abfcea0
+      Signed with the standard Android debug key (v2 scheme). Not a release key.
+
+  pankxu-1.0.0-debug.apk       (the older delivery)
+      Built before the v3.1 changes. It lacks the launch gate entirely, so it
+      cannot be used for the PAR-01..12 or N-01..N-10 tests in docs/QA-REPORT.md.
+      Kept only so you can compare the two. Do not install it for testing.
+
+Install (phone, USB debugging on, adb available on the PC):
+
+  adb install -r pankxu-1.0.0-debug-v31.apk
+
+The debug build has applicationId what.thefcuk.pankxu.debug, so it installs
+alongside any other copy without conflict.
+
+If you would rather verify before installing:
+
+  sha256sum pankxu-1.0.0-debug-v31.apk     # compare with the line above
+
+What it does when you open it:
+  1. Checks for a network connection. If offline: a Retry screen, nothing loads.
+  2. First launch only: a plain-language notice that this is an unofficial client
+     and that Arena collects prompt data for research.
+  3. Routes https://arena.ai pages inside the app; every other link (terms, help,
+     Google sign-in) opens in your browser.
+  4. Blocked: anything that is not https, and schemes such as intent:, javascript:,
+     file:, content:.
+
+Still unverified: nothing in this build has run on a physical device yet.

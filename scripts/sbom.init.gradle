@@ -1,0 +1,40 @@
+// Prints the resolved debug runtime classpath as tab-separated rows so a CycloneDX
+// document can be built from real resolutions rather than a hand-written list.
+//
+//   ./gradlew --no-daemon -I scripts/sbom.init.gradle :app:sbomCoordinates -q
+//
+// Row format:  COORD <group>:<name>:<version> <file-name> <sha256>
+
+gradle.projectsEvaluated {
+    def app = gradle.rootProject.findProject(':app')
+    if (app == null) {
+        throw new GradleException('sbom.init.gradle: project :app not found')
+    }
+    app.tasks.register('sbomCoordinates') {
+        group = 'reporting'
+        description = 'List resolved debug runtime dependencies with SHA-256 digests.'
+        doLast {
+            def rows = new TreeMap<String, List<String>>()
+            def config = app.configurations.getByName('debugRuntimeClasspath')
+            config.incoming.artifactView { it.lenient = false }.artifacts.artifacts.each { artifact ->
+                def id = artifact.id.componentIdentifier
+                if (id instanceof org.gradle.api.artifacts.component.ModuleComponentIdentifier) {
+                    def digest = java.security.MessageDigest.getInstance('SHA-256')
+                    artifact.file.withInputStream { stream ->
+                        byte[] buffer = new byte[8192]
+                        int read
+                        while ((read = stream.read(buffer)) > 0) {
+                            digest.update(buffer, 0, read)
+                        }
+                    }
+                    def hex = digest.digest().collect { String.format('%02x', it) }.join()
+                    def key = "${id.group}:${id.module}:${id.version}".toString()
+                    rows.put(key, [artifact.file.name, hex])
+                }
+            }
+            rows.each { key, value ->
+                println "COORD\t${key}\t${value[0]}\t${value[1]}"
+            }
+        }
+    }
+}

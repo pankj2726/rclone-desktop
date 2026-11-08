@@ -29,3 +29,22 @@ before work starts.
 | D-18 | Canary records blocked/challenged as **Unknown**, runs monthly | 9.2: bot challenges must not raise false alarms. Monthly matches the roadmap's human monthly capture better than weekly | implemented |
 | D-19 | No scripted fetching of arena.ai from now on | 9.1 item 1 and 9.4. Earlier fetches succeeded (recorded 2026-11-08 in docs/research/) but repeated automated access is exactly what the site blocks and the Terms prohibit. Site facts now come from user capture only | implemented |
 | D-20 | `LICENSE` is MIT for this repo's code only | X-01. Explicitly grants nothing in Arena's marks or content | implemented |
+
+## D-21 — Dependency verification must be generated over the whole task set, not just `dependencies`
+
+`--write-verification-metadata` only records what the tasks in that invocation actually
+resolve. Generating it over `:app:dependencies help` leaves out the artifacts that `lintDebug`
+and `testDebugUnitTest` pull, so `gradle/verification-metadata.xml` would pass generation and
+then fail the next real build with "dependency verification failed". The generator therefore
+runs the same three tasks as `build.yml` (`assembleDebug`, `testDebugUnitTest`, `lintDebug`)
+and then re-runs them with the file in place. If the re-run fails, the file is discarded and
+`docs/LIMITATIONS.md` keeps the item open — a verification file that breaks the build is worse
+than none, because the next person deletes it under pressure.
+
+## D-22 — The SBOM is generated from the resolved classpath, never hand-written
+
+`scripts/sbom.init.gradle` reads `debugRuntimeClasspath`, hashes each artifact file, and
+`scripts/make-sbom.py` turns those rows into CycloneDX 1.5. Components that did not actually
+resolve cannot appear, and licence fields are left empty on purpose: the reviewed list is
+`THIRD-PARTY-NOTICES.md`, and inventing SPDX identifiers from memory would be the same class
+of error as writing verification checksums by hand.

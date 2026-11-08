@@ -45,14 +45,20 @@ jobs:
       - name: Generate verification metadata
         run: |
           set -euo pipefail
+          # The task list must match build.yml, otherwise the generated file is
+          # missing whatever lint and the unit tests resolve, and the next build
+          # fails verification. This exact mismatch was the risk noted in D-21.
           ./gradlew --no-daemon --write-verification-metadata sha256 \
-            :app:dependencies help
+            help :app:dependencies :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
           echo "--- generated ---"
           ls -l gradle/verification-metadata.xml
           printf 'components pinned: %s\n' "$(grep -c '<component ' gradle/verification-metadata.xml || true)"
 
       - name: Confirm the build still passes with verification on
-        run: ./gradlew --no-daemon :app:assembleDebug
+        run: |
+          set -euo pipefail
+          ./gradlew --no-daemon :app:assembleDebug :app:testDebugUnitTest :app:lintDebug
+          echo "verification held for the full build.yml task set"
 
       - name: Upload for review
         uses: actions/upload-artifact@v4
