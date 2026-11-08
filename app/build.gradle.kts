@@ -39,6 +39,12 @@ android {
                 keyAlias = System.getenv("PANKXU_KEY_ALIAS")
                 keyPassword = System.getenv("PANKXU_KEY_PASSWORD")
             }
+            // Roadmap section 7 asks for v2 AND v3 verification. AGP signs with v2 only by
+            // default, so v3 was false until this was set (observed in run 42513037427).
+            // v1 (JAR signing) is pointless above minSdk 24 and only slows installs.
+            enableV1Signing = false
+            enableV2Signing = true
+            enableV3Signing = true
         }
     }
 
