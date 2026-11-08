@@ -27,7 +27,7 @@ Legend: **Supported** = implemented and evidenced. **Partial** = works with a st
 | File upload / camera / mic | Unverified | delegated to the browser; no app permissions requested |
 | Downloads | Unverified | browser handles them |
 | URL allow-list | **Supported** | `UrlPolicy` + 9 JVM unit tests passing 2026-11-08; manifest host filter |
-| No permissions | **Supported** | manifest contains zero `<uses-permission>` (verify in CI, P6-07) |
+| No runtime permissions | **Supported** | our own manifest declares none; merged manifest contains exactly one auto-generated signature-level permission from `androidx.startup`, verified in CI run 42488658446 (P6-07) |
 | Cleartext refused | **Supported** | `network_security_config.xml` + `UrlPolicy` rejects `http://` |
 
 Every "Supported" row above is either a code fact checked in this repo or a route checked

@@ -10,7 +10,10 @@ shortcuts and a URL allow-list.
 * Package id: `what.thefcuk.pankxu` (permanent)
 * Version: 1.0.0 (versionCode 10000)
 * minSdk 26, compileSdk/targetSdk 36
-* No permissions requested at all
+* No runtime or dangerous permissions. The merged manifest contains one auto-generated
+  **signature-level** permission (`…DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION`, injected by
+  `androidx.startup`); it is granted only to this app, cannot touch device data, and is not
+  something a user can be prompted for. Verified in CI from the merged manifest (P6-07).
 
 ## Status — read this first
 

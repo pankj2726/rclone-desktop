@@ -12,9 +12,21 @@ CI history so far, each failure fixed rather than worked around:
 |---|---|---|
 | 42488344472 | `android-actions/setup-android@v3` exits 1: `Failed to find package 'tools'` | use the runner's preinstalled SDK (D-13) |
 | 42488423911 | `checkDebugAarMetadata`: androidx.core 1.19.1 needs compileSdk 37 | dependency was unused; removed (D-14) |
-| next | see below | |
+| 42488658446 | **none — success** | Gate G0 met |
 
-Gate G0 is **not yet met** — no green build so far.
+### Gate G0 — MET (run 42488658446)
+
+Green from a clean runner: unit tests, lint, `assembleDebug`, merged-manifest report, artifact upload.
+Evidence pulled back and re-checked locally:
+
+* `app-debug.apk` — 4 906 811 bytes, 402 entries
+* SHA-256 `e185a41f987da7c7e2f7ce07709d10e98714e8eaacdbeac9bb11d75b6dbbe673`
+* APK Signing Block present, **v2 scheme** (debug key) — no v1/JAR signature needed at minSdk 26
+* launcher activity `what.thefcuk.pankxu.PankxuLauncherActivity` present in the binary manifest
+* merged manifest holds exactly one permission: the auto-generated signature-level
+  `…DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` from androidx.startup — not a device capability
+
+APK copied to `artifacts/pankxu-1.0.0-debug.apk` for the device pass.
 
 ## 2026-11-08 — Phases 0-3 (partial), Phase 7 workflows, docs
 
