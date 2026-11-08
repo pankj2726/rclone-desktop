@@ -91,3 +91,19 @@ Row 4-12 is the P6-02 fuzz check in its simplest form; it should be refused by t
 | S-02 | Fuzz: `intent://`, `javascript:`, `file://` variants → refused with a toast, no crash | |
 | S-03 | `adb shell monkey -p what.thefcuk.pankxu -v 500` → no crash (X-28) | |
 | S-04 | `adb shell pm get-app-links what.thefcuk.pankxu` → records the link-verification state (X-08) | |
+
+---
+
+## Merged manifest review, build 42499447209 (P6-07)
+
+Extracted from the APK with `aapt2 dump xmltree`, not read from our source:
+
+| Item | Value |
+|---|---|
+| Permissions | `ACCESS_NETWORK_STATE` (ours, normal-level) and `what.thefcuk.pankxu.debug.DYNAMIC_RECEIVER_NOT_EXPORTED_PERMISSION` (auto-generated, signature-level) |
+| Activities | `LaunchGateActivity` exported; `PankxuLauncherActivity` not exported; `ShortcutTrampolineActivity` exported (library); `ColdShortcutActivity` not exported |
+| Provider | `androidx.startup.InitializationProvider`, not exported |
+| Receiver | `androidx.profileinstaller.ProfileInstallReceiver`, exported, system-permission protected |
+
+No `INTERNET`, no camera, no storage, no location. Analysis and accepted risks:
+`docs/THREAT-MODEL.md`.
