@@ -22,11 +22,16 @@ jobs:
     timeout-minutes: 30
     steps:
       - uses: actions/checkout@v4
+        with:
+          # gitleaks needs history to scan; the action fails with "stderr is not empty"
+          # on a shallow clone (observed in run 42499631142).
+          fetch-depth: 0
 
       - name: Secret scan (X-21)
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITLEAKS_ENABLE_SUMMARY: true
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
