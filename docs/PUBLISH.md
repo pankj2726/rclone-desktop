@@ -41,19 +41,24 @@ The agent runs `scripts/publish-to-github.sh`, which:
 and you can kill it from the same settings page the moment the push lands. Realistically, treating
 a pasted token as burned is the right default — same advice as for the OAuth token earlier.
 
-## Route B — push from your own machine (no secret leaves your device)
+## Route B — carry it out on the bundle (no secret leaves your device)
 
-Download `artifacts/pankxu-source-*.zip` from this workspace, then:
+`artifacts/` holds two files. The bundle is the one that keeps history (R1):
 
 ```bash
-unzip pankxu-source-*.zip && cd pankxu
-git remote set-url origin https://github.com/<you>/pankxu.git   # your new empty repo
+git clone artifacts/repo-<stamp>.bundle pankxu
+cd pankxu
+git remote set-url origin https://github.com/<you>/pankxu.git
 git push -u origin main
 ```
 
-The zip contains the full `.git` directory, so history, tags and the workflows all survive. Create
-the empty repository in the browser first — **do not** initialise it with a README, or the first
-push will be rejected as non-fast-forward.
+`git clone` from a bundle produces a real repository with every commit, tag and branch — this is
+the recovery path R1 specifies, and it doubles as the publishing path. `pankxu-source-<date>.zip`
+is a flat snapshot of the tree with no history; useful for reading or diffing, not for pushing a
+branch on top of.
+
+Create the empty repository in the browser first — **do not** initialise it with a README, or the
+first push is rejected as non-fast-forward.
 
 ---
 
