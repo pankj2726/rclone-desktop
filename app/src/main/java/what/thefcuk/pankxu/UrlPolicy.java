@@ -77,6 +77,13 @@ public final class UrlPolicy {
         if (uri.getUserInfo() != null) {
             return Decision.BLOCK;
         }
+        // S0-08: only the default https port may be loaded in-app. arena.ai on another port
+        // is not arena.ai's published entry point, and letting the app frame arbitrary
+        // services on a known host is exactly the kind of allowance that ages badly.
+        final int port = uri.getPort();
+        if (port != -1 && port != 443) {
+            return Decision.EXTERNAL;
+        }
         final String host = uri.getHost();
         if (host == null) {
             return Decision.BLOCK;

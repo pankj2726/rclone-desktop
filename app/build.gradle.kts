@@ -17,6 +17,20 @@ android {
     // P8-01 / R3: the keystore never lives in the repo and is never read from
     // a committed file. Paths and passwords arrive only as environment variables.
     signingConfigs {
+        // S0-03: one shared DEBUG key, committed on purpose, so consecutive CI builds can
+        // upgrade over each other. Without it every run invents a new debug key, adb refuses
+        // the install with INSTALL_FAILED_UPDATE_INCOMPATIBLE, and upgrade testing (S4-06)
+        // is impossible without wiping the app first.
+        //
+        // A debug key is not a secret: the password below is the Android convention and
+        // anything signed with it is explicitly not a release artifact. The release key is
+        // still supplied only through environment variables, never from the repository.
+        create("sharedDebug") {
+            storeFile = rootProject.file("ci/debug.keystore")
+            storePassword = "android"
+            keyAlias = "androiddebugkey"
+            keyPassword = "android"
+        }
         create("release") {
             val ksPath = System.getenv("PANKXU_KEYSTORE_PATH")
             if (!ksPath.isNullOrBlank()) {
@@ -33,6 +47,9 @@ android {
             isDebuggable = true
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
+            if (rootProject.file("ci/debug.keystore").exists()) {
+                signingConfig = signingConfigs.getByName("sharedDebug")
+            }
         }
         release {
             isMinifyEnabled = true

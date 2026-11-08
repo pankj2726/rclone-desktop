@@ -121,3 +121,54 @@ So `src/main` carries `what.thefcuk.pankxu`, `src/debug` overrides the same file
 `what.thefcuk.pankxu.debug`, and `scripts/check-shortcuts.py` asserts the value inside the
 built APK equals the APK's own package name. A resource-file rule that neither unit tests nor
 lint can see is now a build failure.
+
+## D-27 — No official Arena Android app exists (S0-09, checked 2026-11-08)
+
+Checked Play Store listings and Arena's public help pages on 2026-11-08. There is no
+first-party Arena / LMArena Android application. The Play listings that match the word
+"Arena" are unrelated products (an NHL venue app and an image-generator by a different
+developer), and the public help pages still describe browser access only. **No stop
+condition triggered**; the launcher remains a legitimate personal-use wrapper.
+
+Re-check at the 30-day and 90-day reviews in section 8 of the roadmap, and re-run this task
+immediately if Arena announces one.
+
+## D-28 — One committed debug keystore, because CI was minting a new key per run
+
+Consecutive CI builds could not upgrade each other: each ephemeral runner generated its own
+debug key, so `adb install -r` failed with `INSTALL_FAILED_UPDATE_INCOMPATIBLE` and every
+device test began with an uninstall that wiped app data - which also reset the first-run
+disclosure, making the first-run path untestable in isolation.
+
+`ci/debug.keystore` is now committed and wired into the `debug` build type. This is a
+deliberate, documented exception:
+
+* debug keys are not secrets - the password is the Android convention (`android`), and the
+  certificate is valid only for builds marked debuggable, which are never shipped;
+* the **release** key remains environment-variable-only and is never in the repository;
+* `.gitleaks.toml` allowlists exactly the keystore path and the two convention passwords, so a
+  real secret anywhere else still fails the secret scan.
+
+Fingerprint of the shared debug certificate (SHA-256):
+`8B:C6:CD:ED:D8:D0:5C:C5:D7:49:A6:71:C7:D7:18:F3:6A:8A:44:51:31:F6:6A:93:F7:E0:DD:35:91:20:D4:E4`
+
+This is not the release fingerprint and must never be published as one.
+
+## D-29 — S0-08 allow-list hardening: what changed and what the parser split means
+
+Added to `UrlPolicy` and its tests (18 cases, all passing on a JVM):
+
+* **Any port other than 443 is EXTERNAL.** `https://arena.ai:8443/` is not the published
+  entry point, and allowing the app to frame arbitrary services on a trusted host is an
+  allowance that ages badly.
+* Uppercase scheme and host, a single trailing root dot, and the explicit default port stay
+  IN_APP (already covered, now pinned by tests).
+* Backslash tricks, userinfo in any position, look-alikes (`arena.ai.evil.example`,
+  `evilarena.ai`, `arena-ais.example` style), percent-encoded dots, double trailing dots and a
+  leading dot are all kept out of IN_APP.
+* **Non-ASCII hosts are BLOCKed, not EXTERNAL.** `java.net.URI` returns `null` from
+  `getHost()` for a non-ASCII authority, so the policy cannot name the host and refuses.
+  Android's `Uri.parse()` is lenient and does not agree - which is why the same inputs are
+  also exercised on the device in the S0-08 device run, rather than trusting the unit test to
+  describe runtime behaviour. The two results are recorded together; if they ever diverge,
+  the device wins and the policy gets an explicit punycode/IDN check.

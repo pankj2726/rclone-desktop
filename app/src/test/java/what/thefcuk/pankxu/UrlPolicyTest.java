@@ -1,6 +1,7 @@
 package what.thefcuk.pankxu;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 
 import org.junit.Test;
 
@@ -98,5 +99,95 @@ public class UrlPolicyTest {
         assertEquals(false, UrlPolicy.isAllowedInApp("https://help.arena.ai/"));
         assertEquals(false, UrlPolicy.isAllowedInApp("https://evil.com/"));
         assertEquals(false, UrlPolicy.isAllowedInApp("intent://x"));
+    }
+
+    // ----------------------------------------------------------------------------------
+    // S0-08 -- allow-list hardening. Each case below is a documented spoofing or parser
+    // trick, not a plausible user journey, so the expected value is written next to the
+    // rule it protects rather than in a table elsewhere.
+    // ----------------------------------------------------------------------------------
+
+    @Test
+    public void uppercaseSchemeAndHostStillMatch() {
+        assertEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("HTTPS://ARENA.AI/agent"));
+        assertEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("HtTpS://Arena.Ai/Leaderboard"));
+    }
+
+    @Test
+    public void trailingRootDotIsTheSameName() {
+        assertEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("https://arena.ai./agent"));
+        assertEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("https://ARENA.AI./chat"));
+    }
+
+    @Test
+    public void defaultHttpsPortIsFineOtherPortsAreNotLoadedInApp() {
+        assertEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("https://arena.ai:443/agent"));
+        // Another port on the same host is not the published entry point.
+        assertEquals(UrlPolicy.Decision.EXTERNAL, UrlPolicy.classify("https://arena.ai:8443/agent"));
+    }
+
+    @Test
+    public void backslashIsRejectedNotRepaired() {
+        // Browsers often treat \ as /; java.net.URI does not. Whatever it does, it must
+        // never end up IN_APP, because the two parsers could then disagree about the host.
+        assertNotEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("https://arena.ai\\@evil.example/"));
+        assertNotEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("https:\\\\arena.ai/agent"));
+    }
+
+    @Test
+    public void userinfoCannotMasqueradeAsArena() {
+        assertEquals(UrlPolicy.Decision.BLOCK, UrlPolicy.classify("https://arena.ai@evil.example/"));
+        assertEquals(UrlPolicy.Decision.BLOCK, UrlPolicy.classify("https://evil.example@arena.ai/"));
+        assertEquals(UrlPolicy.Decision.BLOCK, UrlPolicy.classify("https://arena.ai:pass@evil.example/"));
+    }
+
+    @Test
+    public void lookalikeDomainsAreNeverInApp() {
+        String[] lookalikes = {
+            "https://arena.ai.evil.example/",
+            "https://evilarena.ai/",
+            "https://arena.ai.evil.com/",
+            "https://notarena.ai/",
+            "https://arena-ai.example/",
+            "https://arena.ais/",
+            "https://www.arena.ai.evil.example/",
+        };
+        for (String url : lookalikes) {
+            assertEquals("must not load in app: " + url,
+                    UrlPolicy.Decision.EXTERNAL, UrlPolicy.classify(url));
+        }
+    }
+
+    @Test
+    public void nonAsciiHostsAreNeverTreatedAsArena() {
+        // Cyrillic small a (U+0430) in the first label, Cyrillic small i (U+0456) in the
+        // TLD, and fullwidth latin small a (U+FF41).
+        //
+        // The expected outcome is BLOCK, not EXTERNAL, and the reason matters:
+        // java.net.URI parses these URLs but getHost() returns null for a non-ASCII
+        // authority, so the policy cannot even name the host and refuses rather than
+        // forwarding. Android's lenient Uri.parse() disagrees - see the S0-08 note in
+        // DECISIONS.md and the on-device run of the same inputs.
+        String[] unicodeHosts = {
+            "https://\u0430rena.ai/agent",
+            "https://arena.a\u0456/agent",
+            "https://\uFF41rena.ai/agent",
+        };
+        for (String url : unicodeHosts) {
+            assertNotEquals("must never load in app: " + url,
+                    UrlPolicy.Decision.IN_APP, UrlPolicy.classify(url));
+        }
+        assertEquals(UrlPolicy.Decision.BLOCK, UrlPolicy.classify(unicodeHosts[0]));
+        assertEquals(UrlPolicy.Decision.BLOCK, UrlPolicy.classify(unicodeHosts[1]));
+    }
+
+    @Test
+    public void encodedAndDottedTricksStayOutOfTheApp() {
+        // Percent-encoded host characters are not decoded into a name we then trust.
+        assertNotEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("https://arena%2Eai.evil.example/"));
+        // Double trailing dots do not normalise to the apex.
+        assertNotEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("https://arena.ai../agent"));
+        // A leading dot is a different name.
+        assertNotEquals(UrlPolicy.Decision.IN_APP, UrlPolicy.classify("https://.arena.ai/agent"));
     }
 }

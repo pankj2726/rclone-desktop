@@ -67,3 +67,18 @@ evidence, per R7. Fill these in from the device pass; the evidence goes in `docs
 | Offline shows a Retry screen | **Unverified** — coded and shipped, but this simulator would not go offline (Wi-Fi disabled and airplane mode on, `ping 8.8.8.8` still succeeded), so the screen never armed. See `docs/qa-evidence/device-2026-11-08/superseded/WHY.md` |
 | Blocked schemes show a toast and load nothing | **Pass** (2026-11-08) | seven schemes/URLs, each producing exactly one ACTIVITY START; `18-negative-matrix.txt`, `07-block-toast.png` |
 | Shortcuts open the app | **Pass** (2026-11-08) | "Open Agent" launches the gate, then arena.ai; `16-shortcut-disclosure.png`, `17-shortcut-arena.png` |
+
+## S0-04 re-baseline, 2026-11-08
+
+Every row above was re-derived from the device run rather than from intent. Rules used:
+
+* **Pass** only where a screenshot or a log from device D1 shows the behaviour.
+* **Partial** where part of the row was observed and part was not.
+* **Unverified** where the row needs sign-in, a prompt submission, offline control, or Chrome -
+  none of which device D1 can provide.
+* Nothing is marked Pass on unit-test evidence alone; the unit tests are cited as design
+  evidence, not as device evidence.
+
+Device D1 column, summary: PAR-02, PAR-04, PAR-06, PAR-09, PAR-11 Pass; PAR-05 Partial;
+PAR-01, PAR-03, PAR-07, PAR-08, PAR-10, PAR-12 Unverified. P4 rows (URL bar, splash, app
+identity, back from the TWA) remain Unverified because no TWA provider exists on D1.

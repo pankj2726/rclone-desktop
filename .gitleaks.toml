@@ -1,0 +1,18 @@
+# gitleaks configuration.
+#
+# The only allowance is the committed DEBUG keystore and the Android-convention password it
+# uses. Both are deliberately public: a debug key signs nothing but throwaway builds, and the
+# release key is never in the repository (it arrives through environment variables in CI).
+# The allowlist is path-scoped so a real secret anywhere else still fails the build.
+[extend]
+useDefault = true
+
+[allowlist]
+description = "Committed debug keystore (S0-03) - not a secret by construction"
+paths = [
+  '''ci/debug.keystore''',
+]
+regexes = [
+  '''storePassword = "android"''',
+  '''keyPassword = "android"''',
+]
