@@ -28,6 +28,7 @@ The absence of Chrome is what makes this device interesting: it exercises the
 | v33 (`da4e957`) | `7abf1884…dc1a6e9` | names the Custom Tab fallback instead of degrading silently |
 | v34 (`2ca68ae`) | `5108bceb…52794dc7` | light theme parent — the gate was white-on-white |
 | v36 (`24719b8`) | `5895069b…2f15c67` | per-build-type shortcut targets |
+| v40 (`7fc0d38`+) | `e25d7da4…d79d0ee5` | About and licences screens, shared debug key, accessibility checks |
 
 Every build was installed over `adb install` of a CI artifact, uninstalled first where the
 debug signing key differed (CI generates a fresh debug keystore per run, so signatures do
@@ -51,7 +52,15 @@ not carry over between runs).
 | `22-side-by-side.png` | `/side-by-side` loaded with two model pickers (PAR-02) |
 | `22-leaderboard.png` | `/leaderboard` loaded: "Arena Leaderboard: Official AI Mode" (PAR-06) |
 | `20-cookies-accepted.png` | cookie consent dismissed (PAR-09) |
+| `25-gate-with-about.png` | gate after the About button was added |
+| `26-about-screen.png` | About: version, unofficial notice, research disclosure, four actions |
+| `27-licences.png` | bundled open-source notices |
+| `28-large-font-1.5x.png` | gate at the largest system font: nothing clipped |
+| `29-dark-mode.png` | gate in dark mode: black background, legible text |
 | `superseded/` | blank or misleading captures, with a note saying why each was dropped |
+
+Status and navigation bars have been cropped from every capture (R13). The checksums in
+`SHA256SUMS` are of the cropped files and were regenerated after the crop.
 
 ## How the measurements were taken
 
