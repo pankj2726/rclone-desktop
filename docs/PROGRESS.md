@@ -2,6 +2,28 @@
 
 Updated at the end of every phase (R2). Newest at the top.
 
+## 2026-11-08 — roadmap v4, stage 0 and part of stage 2
+
+* **S0-09:** no official Arena/LLaMArena Android app exists (D-27). No stop condition.
+* **S0-03:** committed `ci/debug.keystore` so CI builds share one signature; two consecutive
+  installs now upgrade in place instead of forcing an uninstall (D-28). Release key still
+  environment-only.
+* **S0-08:** allow-list hardened — 18 unit cases; non-443 ports are EXTERNAL; non-ASCII hosts
+  BLOCK because `java.net.URI` yields a null host there (D-29).
+* **S0-07:** shortcut-target tests for both build types, and a theme/colour pairing test that
+  fails if the white-on-white bug of D-24 returns. Verified by reintroducing the bug and
+  watching the test fail.
+* **S0-04, S0-05:** matrix re-baselined from device evidence; all captures cropped to remove
+  the status and navigation bars (R13); `superseded/WHY.md` explains the discarded ones.
+* **S2-04:** About and licences screens, with a user-initiated redacted diagnostics export.
+  Seen on the device.
+* **S2-05:** 1.5x font and dark mode pass on the device; TalkBack and RTL recorded Unverified
+  with reasons.
+* Repo hygiene: `cache/` was committed by accident (build-artifact zips, about 10 MB of pack);
+  untracked and ignored now.
+
+Full state per task: `docs/ROADMAP-V4-STATUS.md`.
+
 ## 2026-11-08 — first device run (Samsung SM-G9900, Android 12)
 
 Installed CI artifacts on a real handset over adb and worked through the QA report. The app
