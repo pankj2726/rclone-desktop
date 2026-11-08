@@ -65,6 +65,13 @@ jobs:
           chmod 600 "$ks"
           echo "PANXKU_KEYSTORE_PATH=$ks" >> "$GITHUB_ENV"
 
+      - name: Report the effective signing configuration
+        run: |
+          set -euo pipefail
+          echo "PANKXU_KEYSTORE_PATH is ${PANKXU_KEYSTORE_PATH:+set}${PANKXU_KEYSTORE_PATH:-unset}"
+          ls -l "$PANKXU_KEYSTORE_PATH" || true
+          ./gradlew --no-daemon -q :app:signingReport 2>&1 | sed -n '1,60p'
+
       - name: Build release
         env:
           PANKXU_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
