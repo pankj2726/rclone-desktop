@@ -80,19 +80,8 @@ def main(path):
     for perm in sorted(FORBIDDEN_PERMISSIONS & perms):
         failures.append(f"unexpected permission: {perm} (the app must not hold INTERNET)")
 
-    # Hard-coded shortcut targets break the debug build, which has applicationId
-    # ...pankxu.debug. The launcher then logs "Shortcut could not be started".
-    shortcuts = "app/src/main/res/xml/shortcuts.xml"
-    if pathlib.Path(shortcuts).exists():
-        body = pathlib.Path(shortcuts).read_text(encoding="utf-8")
-        # Strip comments first: the file documents this rule in prose, and matching
-        # the prose made the guard fail on a correct file (caught while adding it).
-        body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
-        if re.search(r"android:targetPackage\s*=", body):
-            failures.append(
-                f"{shortcuts}: android:targetPackage hard-codes one applicationId; "
-                "omit it so the platform uses the owning app's package"
-            )
+    # Shortcut targets are checked against the built APK by scripts/check-shortcuts.py,
+    # which is the only place the packaged package name is authoritative.
 
     print(f"activities declared: {len(names)}")
     for name in sorted(names):

@@ -4,12 +4,18 @@
   no invented routes. "Battle" is deliberately absent: no /battle route exists
   in robots.txt and no href to one appears on the home page (see DECISIONS.md D-02).
 
-  android:targetPackage is deliberately NOT set. Hard-coding it bound the shortcut to
-  the release applicationId, so on the debug build the launcher logged
-  "ActivityNotFoundException: Shortcut could not be started" and nothing opened
-  (device evidence: docs/qa-evidence/device-2026-11-08/15-shortcut-tap-result.png).
-  With only targetClass set, the platform uses the package of the app that owns the
-  shortcut, which is correct for both the .debug and release builds.
+  android:targetPackage MUST be set, and it must be the applicationId of the build
+  that ships this file. History, both observed on a device:
+
+  * Hard-coded to the release id while the debug build uses what.thefcuk.pankxu.debug
+    -> "ActivityNotFoundException: Shortcut could not be started" (evidence:
+    docs/qa-evidence/device-2026-11-08/15-shortcut-tap-result.png).
+  * Omitted entirely -> the launcher drops the component, the intent becomes implicit,
+    and the user gets a browser/chooser sheet instead of the app.
+
+  So src/main carries the release id and src/debug overrides this exact file with the
+  .debug id. scripts/check-shortcuts.py asserts the packaged value matches the
+  package name of the built APK.
 -->
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -20,6 +26,7 @@
         android:shortcutLongLabel="@string/shortcut_agent_long">
         <intent
             android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu"
             android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/agent" />
     </shortcut>
@@ -31,6 +38,7 @@
         android:shortcutLongLabel="@string/shortcut_chat_long">
         <intent
             android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu"
             android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/chat" />
     </shortcut>
@@ -42,6 +50,7 @@
         android:shortcutLongLabel="@string/shortcut_sidebyside_long">
         <intent
             android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu"
             android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/side-by-side" />
     </shortcut>
@@ -53,6 +62,7 @@
         android:shortcutLongLabel="@string/shortcut_leaderboard_long">
         <intent
             android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu"
             android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/leaderboard" />
     </shortcut>

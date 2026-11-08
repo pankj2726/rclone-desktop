@@ -83,6 +83,13 @@ jobs:
       - name: Check manifest contract (regression guard)
         run: python3 scripts/check-manifest.py merged-manifest.txt
 
+      - name: Check shortcut targets match the built package
+        run: |
+          set -euo pipefail
+          python3 scripts/check-shortcuts.py \
+            app/build/outputs/apk/debug/app-debug.apk \
+            "$ANDROID_HOME/build-tools/36.0.0/aapt2"
+
       - name: Generate SBOM (P6-06)
         run: |
           set -euo pipefail
