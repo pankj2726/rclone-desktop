@@ -11,7 +11,10 @@ Known and deliberate, not defects.
    the browser. Clearing app data does not sign you out; clearing Chrome data does.
 4. **The app is a launcher, not a client.** No offline mode, no notifications, no background
    work, no share-target, no API calls.
-5. **Chrome (or another TWA-capable browser) must be installed.** Without one, the app falls
+5. **Chrome (or another TWA-capable browser) must be installed for the app to look like an app.**
+   Without one the app still works, but it opens in a Custom Tab with a URL bar, and the gate
+   says so before continuing (D-25). Confirmed on a device that has no Chrome: 2026-11-08.
+   Without one, the app falls
    back to a Custom Tab, and then to the default browser via `ACTION_VIEW`. If no browser
    exists at all, there is nothing to show and the app cannot function — by design, since the
    alternative would be an embedded WebView, which Google blocks for sign-in.

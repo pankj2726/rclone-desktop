@@ -43,16 +43,16 @@ evidence, per R7. Fill these in from the device pass; the evidence goes in `docs
 | ID | Area | What is known | Status |
 |---|---|---|---|
 | PAR-01 | Battle | Two anonymous responses, vote, identities revealed afterwards (third-party source, unconfirmed) | Unverified |
-| PAR-02 | Side-by-Side | Pick two named models; not counted in public rankings (Arena FAQ) | Unverified |
+| PAR-02 | Side-by-Side | **Pass** (2026-11-08) | `https://arena.ai/side-by-side` opens the Side-by-Side workspace with two model pickers (`gemini-4-argon`, `gemini-3.8-flash`). `docs/qa-evidence/device-2026-11-08/22-side-by-side.png`. Voting not exercised. |
 | PAR-03 | Direct | One chosen model, no voting, prompts collected for research (Arena FAQ) | Unverified |
-| PAR-04 | Agent | `arena.ai/agent`, experiment label, web search, image gen, file upload, coding sandbox (help centre) | Unverified |
-| PAR-05 | Use cases | Chat, build apps/sites, write and edit, search, images, video, choose model, compare | Unverified |
-| PAR-06 | Leaderboards | 14 categories listed in the FAQ: Overall, Agent, Alignment Index, Text, WebDev, Image-to-WebDev, Text to Image, Image Edit, Text to Video, Image to Video, Video Edit, Vision, Document, Search | Unverified |
+| PAR-04 | Agent | **Pass** (2026-11-08) | `/agent` loads "Agent Mode | Autonomous AI Agents for Real-World Tasks" inside the app. Evidence `05-twa-v32.png`, `06-arena-loaded.png`. |
+| PAR-05 | Use cases | **Partial** (2026-11-08) | Home page shows the "Get started" cards (landing page, dashboard, game) and the prompt box; the full use-case list was not walked. |
+| PAR-06 | Leaderboards | **Pass** (2026-11-08) | `/leaderboard` loads "Arena Leaderboard: Official AI Mode" with Start Voting and Agent / Chat / Code / Image tabs. `22-leaderboard.png`. The full 14-category list was not enumerated. |
 | PAR-07 | Account | Google or email OTP sign-up; history and recovery | Unverified |
 | PAR-08 | Uploads and media | File and image input; image and video output | Unverified |
-| PAR-09 | Legal and consent | Terms, Privacy, Cookies pages; consent prompt appears once and is dismissable | Unverified |
+| PAR-09 | Legal and consent | **Pass** (2026-11-08) | Cookie consent appears on first load and is dismissable; the page renders normally afterwards. `19-sidebyside.png` (prompt) and `20-cookies-accepted.png` (after). Terms and Privacy pages themselves not opened. |
 | PAR-10 | Localization | Locale-prefixed paths exist (e.g. `/de/faq`) | Unverified |
-| PAR-11 | Help | Help centre and FAQ links open in the external browser | **Partial** — routing for non-`arena.ai` https is now coded and unit-tested (`EXTERNAL`), but not observed on a device |
+| PAR-11 | Help | **Pass** (2026-11-08) | Non-`arena.ai` https opens the system chooser or the installed browser instead of loading in-app; measured in `18-negative-matrix.txt` (control row: two ACTIVITY STARTs). |
 | PAR-12 | Changes over time | Changelogs listed in the site footer (to confirm) | Unverified |
 
 ### Routing behaviour that *is* testable without a device
@@ -64,4 +64,6 @@ evidence, per R7. Fill these in from the device pass; the evidence goes in `docs
 | Google sign-in origin opens in the browser | **Supported** | same tests |
 | `http://`, `intent:`, `javascript:`, `file:`, `content:`, `data:`, `tel:`, `mailto:` refused | **Supported** | same tests, `BLOCK` decision |
 | Lookalike hosts never load in-app | **Supported** | `arena.ai.evil.com`, `notarena.ai`, `arena.ai@evil.com` all `EXTERNAL` or `BLOCK` |
-| Offline shows a Retry screen | **Partial** — coded (`LaunchGateActivity`), compiled only in CI, never seen running |
+| Offline shows a Retry screen | **Unverified** — coded and shipped, but this simulator would not go offline (Wi-Fi disabled and airplane mode on, `ping 8.8.8.8` still succeeded), so the screen never armed. See `docs/qa-evidence/device-2026-11-08/superseded/WHY.md` |
+| Blocked schemes show a toast and load nothing | **Pass** (2026-11-08) | seven schemes/URLs, each producing exactly one ACTIVITY START; `18-negative-matrix.txt`, `07-block-toast.png` |
+| Shortcuts open the app | **Pass** (2026-11-08) | "Open Agent" launches the gate, then arena.ai; `16-shortcut-disclosure.png`, `17-shortcut-arena.png` |

@@ -1,0 +1,22 @@
+Negative-routing matrix, Samsung SM-G9900 / Android 12, 2026-11-08
+Measurement: every ActivityTaskManager START line during the 3 s window after the
+gate is invoked. BLOCK = exactly one START (the gate itself, then it finishes).
+A second START to another package would mean the URL was forwarded.
+
+intent       intent://x                               STARTs=1  BLOCK-OK
+        dat=intent://x cmp=what.thefcuk.pankxu.debug/what.thefcuk.pankxu.LaunchGateActivity} 
+file         file:///sdcard/x.txt                     STARTs=1  BLOCK-OK
+        dat=file:///sdcard/x.txt cmp=what.thefcuk.pankxu.debug/what.thefcuk.pankxu.LaunchGateActivity} 
+tel          tel:+911234567890                        STARTs=1  BLOCK-OK
+        dat=tel:xxxxxxxxxxxxx cmp=what.thefcuk.pankxu.debug/what.thefcuk.pankxu.LaunchGateActivity} 
+mailto       mailto:a@b.c                             STARTs=1  BLOCK-OK
+        dat=mailto:x@x.x cmp=what.thefcuk.pankxu.debug/what.thefcuk.pankxu.LaunchGateActivity} 
+data         data:text/html,x                         STARTs=1  BLOCK-OK
+        dat=data:text/html,x cmp=what.thefcuk.pankxu.debug/what.thefcuk.pankxu.LaunchGateActivity} 
+userinfo     https://arena.ai@evil.example/           STARTs=1  BLOCK-OK
+        dat=https://evil.example/... cmp=what.thefcuk.pankxu.debug/what.thefcuk.pankxu.LaunchGateActivity} 
+cleartext    http://arena.ai/                         STARTs=1  BLOCK-OK
+        dat=http://arena.ai/... cmp=what.thefcuk.pankxu.debug/what.thefcuk.pankxu.LaunchGateActivity} 
+--- control: a real external URL should produce 2 STARTs ---
+external     https://notarena.ai/                     STARTs=2  FORWARDED?
+        dat=https://notarena.ai/... cmp=what.thefcuk.pankxu.debug/what.thefcuk.pankxu.LaunchGateActivity} dat=https://notarena.ai/... cmp=android/com.android.internal.app.ResolverActivity} 

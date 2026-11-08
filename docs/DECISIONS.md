@@ -86,3 +86,38 @@ build passes. Runtime-only contracts now have a build-time test.
 **Honest note.** This bug existed in every release so far, including `v1.0.0-debug` and
 `v1.0.0-unsigned`. None of them would have launched. The docs claiming "built, not yet
 verified" were accurate, and this is what verification buys.
+
+## D-24 — Light and dark themes must pair with light and dark bar colours
+
+`Theme.Pankxu` inherited `@android:style/Theme.Material.NoActionBar`, which is the **dark**
+platform theme, while `@color/bar` is `#FFFFFFFF` in light mode. The result on a device was a
+white-on-white gate: the title, the status text and the unofficial-client notice were all
+present in the view tree and invisible on screen. The parent is now `Theme.Material.Light`
+in `values/` and stays `Theme.Material` in `values-night/`, matching the colour split that
+already existed. Lesson recorded because the failure is silent to lint: the layout is valid,
+the strings resolve, and only a screenshot catches it.
+
+## D-25 — Say when the TWA is not a TWA
+
+Without a browser declaring `androidx.browser.trusted.category.TrustedWebActivities`, the
+library degrades to a Custom Tab in whatever browser is installed. That is a reasonable
+fallback, but it is not the product described in the README, and the user had no way to know
+why arena.ai opened in a tab with a URL bar. `TwaProviderCheck` asks the PackageManager; if no
+provider is present the gate explains the difference and offers "Continue in browser". The
+check runs on every launch, so installing Chrome later takes effect without clearing data.
+Declared in `docs/LIMITATIONS.md` rather than hidden.
+
+## D-26 — Shortcut targets are per build type, and checked against the packaged APK
+
+`android:targetPackage` must name the applicationId of the build that ships the file. Two
+failures were observed on the device, in this order:
+
+1. hard-coded to the release id -> `ActivityNotFoundException: Shortcut could not be started`
+   on the debug build;
+2. omitted -> the launcher drops the component, the intent becomes implicit and a chooser
+   opens instead of the app.
+
+So `src/main` carries `what.thefcuk.pankxu`, `src/debug` overrides the same file with
+`what.thefcuk.pankxu.debug`, and `scripts/check-shortcuts.py` asserts the value inside the
+built APK equals the APK's own package name. A resource-file rule that neither unit tests nor
+lint can see is now a build failure.
