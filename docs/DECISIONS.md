@@ -172,3 +172,25 @@ Added to `UrlPolicy` and its tests (18 cases, all passing on a JVM):
   also exercised on the device in the S0-08 device run, rather than trusting the unit test to
   describe runtime behaviour. The two results are recorded together; if they ever diverge,
   the device wins and the policy gets an explicit punycode/IDN check.
+
+## D-30 — The TWA-capability check asked about the wrong component type
+
+`TwaProviderCheck` originally queried *services* for
+`androidx.browser.trusted.category.TrustedWebActivities`. Installing Chrome 156 on the test
+device and reading its manifest showed the category on
+`org.chromium.chrome.browser.browserservices.ManageTrustedWebActivityDataActivity`, an
+**activity**. The service query therefore always came back empty, and the gate told the user
+"Chrome is not installed" on a device where Chrome was installed and signed in. It now queries
+activities.
+
+Two things worth keeping:
+
+1. **A capability check is not a promise.** Even with Chrome present, arena.ai publishes no
+   `assetlinks.json` for this package, so the browser shows its toolbar anyway - what the
+   device produced was a Custom Tab inside `com.android.chrome`, not a Trusted Web Activity.
+   The notice now says what is actually true ("Arena has not published a link-verification
+   file, so the toolbar stays visible") instead of blaming the device.
+2. **The earlier pass could not have caught this.** With no TWA-capable browser installed, a
+   permanently-empty query and a correct answer look identical. Only installing Chrome
+   separated them. The same trap applies to any check that is trivially true in the test
+   environment.

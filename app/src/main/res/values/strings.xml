@@ -31,7 +31,8 @@ This app collects nothing. Use test prompts containing no personal data while ev
     <string name="gate_rejected">That link is not supported.</string>
     <string name="gate_no_browser">No browser installed to open this link.</string>
     <string name="gate_checking">Opening arena.ai…</string>
-    <string name="gate_no_twa_notice">Chrome is not installed, so arena.ai opens in a browser tab instead of full screen. Install Chrome to get the app-like view.</string>
+    <string name="gate_no_twa_notice">Arena has not published a link-verification file for this app, so the browser toolbar stays visible. arena.ai still opens inside the app window.</string>
+    <string name="gate_no_browser_twa">No browser on this device can run an app window. Install Chrome for the closest match, or continue and arena.ai opens in your default browser.</string>
     <string name="gate_continue">Continue in browser</string>
     <string name="gate_about">About</string>
 

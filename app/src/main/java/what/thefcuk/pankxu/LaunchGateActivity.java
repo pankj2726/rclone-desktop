@@ -106,9 +106,15 @@ public class LaunchGateActivity extends Activity {
         // A TWA needs a browser that declares the TrustedWebActivities category. Without
         // one the library degrades to a Custom Tab, which is a browser tab with a URL bar
         // rather than the app-like experience. Say so once instead of degrading silently.
-        if (!proceedingWithoutTwa && !TwaProviderCheck.isProviderInstalled(this)) {
-            showFallbackNotice();
-            return;
+        if (!proceedingWithoutTwa) {
+            if (!TwaProviderCheck.isProviderInstalled(this)) {
+                showFallbackNotice(R.string.gate_no_browser_twa);
+                return;
+            }
+            if (TwaProviderCheck.toolbarAlwaysVisible()) {
+                showFallbackNotice(R.string.gate_no_twa_notice);
+                return;
+            }
         }
 
         // IN_APP: hand to the Trusted Web Activity launcher, which re-validates.
@@ -133,9 +139,10 @@ public class LaunchGateActivity extends Activity {
      * browser tab deliberately. Re-checked on every launch, so installing Chrome later
      * takes effect without clearing app data.
      */
-    private void showFallbackNotice() {
-        Log.i(TAG, "no Trusted Web Activity provider installed; TWA will fall back to a Custom Tab");
-        status.setText(R.string.gate_no_twa_notice);
+    private void showFallbackNotice(int message) {
+        Log.i(TAG, "routing notice shown; provider=" + TwaProviderCheck.providerPackage(this)
+                + " twaAvailable=" + TwaProviderCheck.isProviderInstalled(this));
+        status.setText(message);
         status.setVisibility(View.VISIBLE);
         Button retry = findViewById(R.id.gate_retry);
         retry.setText(R.string.gate_continue);
