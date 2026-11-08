@@ -97,6 +97,8 @@ jobs:
       - name: Publish release
         uses: softprops/action-gh-release@v2
         with:
+          # Release candidates are published but never look like the final thing.
+          prerelease: ${{ contains(github.ref_name, 'rc') }}
           files: |
             pankxu-*.apk
             SHA256SUMS.txt
