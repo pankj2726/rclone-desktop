@@ -15,3 +15,6 @@ before work starts.
 | D-08 | Only `arena.ai` is allow-listed, no subdomains | No subdomain has been confirmed to us as an entry point. Conservative by design | implemented |
 | D-09 | Java sources compile as UTF-8 explicitly | A real failure caught while testing: em dashes in comments broke `javac` under a C locale | implemented |
 | D-10 | `lint { abortOnError = false }` for the first CI run | The project has never been built by Gradle. Turning lint into a hard gate before the first successful compile makes no sense; flip it once green | temporary |
+
+| D-11 | Default branch is `main`, and the bundle is built from it | Found by cloning the bundle: `git clone` of a `master` repo produced `master`, while every workflow triggers on `main`. A push would have created a default branch no CI listens to | implemented |
+| D-12 | `artifacts/*.bundle` and `artifacts/*.zip` are git-ignored | Committing a bundle puts the previous bundle inside the new one; the repository grows recursively on every commit. `artifacts/` is snapshotted, `dist`/`build`/`out` are not, so they belong on disk and out of history | implemented |
