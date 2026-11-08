@@ -63,13 +63,18 @@ jobs:
           ks="$RUNNER_TEMP/release.jks"
           printf '%s' "$KEYSTORE_BASE64" | base64 -d > "$ks"
           chmod 600 "$ks"
-          echo "PANXKU_KEYSTORE_PATH=$ks" >> "$GITHUB_ENV"
+          echo "PANKXU_KEYSTORE_PATH=$ks" >> "$GITHUB_ENV"
 
       - name: Report the effective signing configuration
         run: |
           set -euo pipefail
           echo "PANKXU_KEYSTORE_PATH is ${PANKXU_KEYSTORE_PATH:+set}${PANKXU_KEYSTORE_PATH:-unset}"
-          ls -l "$PANKXU_KEYSTORE_PATH" || true
+          if [ -z "${PANKXU_KEYSTORE_PATH:-}" ]; then
+            echo "::error::PANKXU_KEYSTORE_PATH is empty - build.gradle.kts reads exactly that"
+            echo "name, so a typo here silently produces an UNSIGNED release."
+            exit 1
+          fi
+          ls -l "$PANKXU_KEYSTORE_PATH"
           ./gradlew --no-daemon -q :app:signingReport 2>&1 | sed -n '1,60p'
 
       - name: Build release
