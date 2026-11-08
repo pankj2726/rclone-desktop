@@ -4,13 +4,13 @@ Each line is the actual state, not the intended state.
 
 | Requirement | State | Evidence |
 |---|---|---|
-| Human-in-the-loop capture files saved with dates (9.4) | **Not done** | `docs/site-capture/` has the template, the instructions and the superseded 2026-11-08 agent fetch. No human capture yet. |
+| Human-in-the-loop capture files saved with dates (9.4) | **Not done — blocks nothing else, but the entry URLs stay unconfirmed** | `docs/site-capture/` has the template, the instructions and the superseded 2026-11-08 agent fetch. No human capture yet. |
 | PAR-01..12 marked Pass / Fail / Unverified | **Done — all Unverified** | `docs/COMPATIBILITY.md` parity table; nothing has been run on a device |
 | Privacy disclosure and unofficial-client notice visible in app and README | **Done in code** | `LaunchGateActivity` first-run dialog; `unofficial_notice` on the gate screen; README banner. Compiled and lint-clean in CI, never seen on a device. |
 | Key backup restore test done and fingerprint published (X-17, X-19) | **Blocked** | no keystore exists yet; `docs/KEY-MANAGEMENT.md` has the procedure and an empty results table |
 | Key rotation and incident plans written (X-18, X-23) | **Done** | `docs/KEY-MANAGEMENT.md` (rotation with v3 lineage), `docs/LEGAL-NOTES.md` (incident plan) |
 | Secret scan clean | **Done** | gitleaks runs as the first step of `build`; green in runs 42499683401, 42499920602, 42500268168. It needed full history (run 42499631142 failed on a shallow clone) |
-| SBOM and licence notices included | **Done** (SBOM per build) | CycloneDX 1.5 `sbom.cdx.json`, 48 resolved components with SHA-256, generated every build and uploaded (run 42499920602). Not yet re-attached to the release page; `docs/LIMITATIONS.md` item 8 |
+| SBOM and licence notices included | **Done** (SBOM per build) | CycloneDX 1.5 `sbom.cdx.json`, 48 resolved components with SHA-256, generated every build and uploaded (run 42499920602). Also attached to the `v1.0.0-debug` release alongside `verification-metadata.xml`. It is a per-build file, so regenerate rather than reuse (`docs/LIMITATIONS.md` item 8) |
 | Link verification state recorded (9.7) | **Done — unverified origin** | `docs/LINK-VERIFICATION.md`; `assetlinks.json` is `{}` as captured 2026-11-08. Device state to be recorded from `pm get-app-links` |
 | Negative test list (X-31) run or marked Unverified with reasons | **Marked Unverified** | `docs/QA-REPORT.md`, N-01..N-10 |
 
