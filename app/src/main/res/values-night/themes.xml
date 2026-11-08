@@ -1,5 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!--
+      Dark variant: the dark platform theme pairs with the black @color/bar, so the
+      theme's text colours stay legible. Keep this in step with values/themes.xml.
+    -->
     <style name="Theme.Pankxu" parent="@android:style/Theme.Material.NoActionBar">
         <item name="android:windowBackground">@color/bar</item>
         <item name="android:statusBarColor">@color/bar</item>

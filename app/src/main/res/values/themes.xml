@@ -1,8 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- LauncherActivity in androidbrowserhelper extends android.app.Activity,
-         so a platform theme is correct here; AppCompat is not required. -->
-    <style name="Theme.Pankxu" parent="@android:style/Theme.Material.NoActionBar">
+    <!--
+      LauncherActivity in androidbrowserhelper extends android.app.Activity, so a
+      platform theme is correct here; AppCompat is not required.
+
+      Light variant. The parent MUST match the values-night twin: Theme.Material is
+      the DARK platform theme, and pairing it with the white @color/bar background
+      produced white text on a white screen (found on a device 2026-11-08, see
+      docs/qa-evidence/device-2026-11-08/10-no-twa-notice.png). Dark text needs the
+      Light parent; the night variant keeps the dark one.
+    -->
+    <style name="Theme.Pankxu" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:windowBackground">@color/bar</item>
         <item name="android:statusBarColor">@color/bar</item>
         <item name="android:navigationBarColor">@color/bar</item>
