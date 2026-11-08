@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  P3-08. Four shortcuts, every URL taken from arena.ai/robots.txt (P1-04) —
+  no invented routes. "Battle" is deliberately absent: no /battle route exists
+  in robots.txt and no href to one appears on the home page (see DECISIONS.md D-02).
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="agent"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/shortcut_agent_short"
+        android:shortcutLongLabel="@string/shortcut_agent_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu"
+            android:targetClass="what.thefcuk.pankxu.PankxuLauncherActivity"
+            android:data="https://arena.ai/agent" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="chat"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/shortcut_chat_short"
+        android:shortcutLongLabel="@string/shortcut_chat_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu"
+            android:targetClass="what.thefcuk.pankxu.PankxuLauncherActivity"
+            android:data="https://arena.ai/chat" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="side_by_side"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/shortcut_sidebyside_short"
+        android:shortcutLongLabel="@string/shortcut_sidebyside_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu"
+            android:targetClass="what.thefcuk.pankxu.PankxuLauncherActivity"
+            android:data="https://arena.ai/side-by-side" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="leaderboard"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/shortcut_leaderboard_short"
+        android:shortcutLongLabel="@string/shortcut_leaderboard_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu"
+            android:targetClass="what.thefcuk.pankxu.PankxuLauncherActivity"
+            android:data="https://arena.ai/leaderboard" />
+    </shortcut>
+
+</shortcuts>

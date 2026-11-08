@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  P3-03: no <uses-permission> entries at all. The TWA hands upload, camera and
+  microphone work to the browser, which already holds those grants.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <application
+        android:allowBackup="false"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Pankxu">
+
+        <!--
+          P3-04/P3-05: the library activity, not a hand-rolled one, so the
+          TWA -> Custom Tab -> browser fallback chain and inbound URL validation
+          come from the maintained implementation.
+
+          P3-07: android:autoVerify is deliberately NOT set. Arena's
+          /.well-known/assetlinks.json is currently {} (checked 2026-11-08),
+          so verification would fail and the attribute would only produce noise.
+          Turn it on after Arena publishes an asset statement (Phase 5).
+        -->
+        <activity
+            android:name=".PankxuLauncherActivity"
+            android:exported="true"
+            android:theme="@style/Theme.Pankxu">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+
+            <!-- Inbound arena.ai links. The host is concrete, never a wildcard. -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="arena.ai" />
+            </intent-filter>
+
+            <meta-data
+                android:name="android.support.customtabs.trusted.DEFAULT_URL"
+                android:value="@string/default_url" />
+            <meta-data
+                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
+                android:resource="@color/bar" />
+            <meta-data
+                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK"
+                android:resource="@color/bar" />
+            <meta-data
+                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
+                android:resource="@color/bar" />
+            <meta-data
+                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK"
+                android:resource="@color/bar" />
+            <meta-data
+                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
+                android:resource="@color/bar" />
+            <!-- Custom Tab only. WebView fallback is forbidden: Google blocks
+                 sign-in in embedded WebViews (Container Plan s1). -->
+            <meta-data
+                android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
+                android:value="customtabs" />
+
+            <!-- P3-08 -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+
+    </application>
+</manifest>

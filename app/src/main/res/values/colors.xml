@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--
+      DECISIONS.md D-03: arena.ai publishes no theme-color meta tag (P1-01) and
+      serves separate light/dark apple-touch-icons, so the app has no single
+      correct bar colour. These are neutral, theme-following values chosen to
+      avoid a white flash on a dark device and a dark flash on a light one.
+      Change here, nowhere else.
+    -->
+    <color name="bar">#FFFFFFFF</color>
+    <color name="ic_launcher_background">#FF12121A</color>
+</resources>

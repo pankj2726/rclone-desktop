@@ -1,0 +1,60 @@
+name: canary
+
+# P7-04 — weekly check that Arena's public surface has not moved under us.
+# Read-only, one request per URL per week (R4). Never fails the repo; it opens an issue.
+on:
+  schedule:
+    - cron: '0 6 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  canary:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Probe public surface
+        id: probe
+        run: |
+          set -uo pipefail
+          fail=0
+          report=""
+          check() {
+            code=$(curl -sS -o /dev/null -m 20 -w '%{http_code}' "$1" || echo 000)
+            report="${report}\n$2: HTTP $code ($1)"
+            [ "$code" = "200" ] || fail=1
+          }
+          check "https://arena.ai/" "home"
+          check "https://arena.ai/agent" "agent"
+          check "https://arena.ai/chat" "chat"
+          check "https://arena.ai/side-by-side" "side-by-side"
+          check "https://arena.ai/leaderboard" "leaderboard"
+          check "https://arena.ai/manifest.webmanifest" "manifest probe"
+          al=$(curl -sS -m 20 https://arena.ai/.well-known/assetlinks.json || echo "")
+          if [ "$al" = "{}" ]; then
+            report="${report}\nassetlinks: still empty — URL bar will remain"
+          else
+            report="${report}\nassetlinks: CHANGED — re-run Phase 5"
+          fi
+          printf '%b\n' "$report"
+          printf '%b\n' "$report" > canary-report.txt
+          echo "fail=$fail" >> "$GITHUB_OUTPUT"
+
+      - name: Open an issue on change
+        if: steps.probe.outputs.fail != '0'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const body = fs.readFileSync('canary-report.txt', 'utf8');
+            await github.rest.issues.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: `Canary: arena.ai public surface changed (${new Date().toISOString().slice(0,10)})`,
+              body: 'A weekly canary request did not return 200. Re-check entry URLs before the next release.\n\n```\n' + body + '\n```'
+            });

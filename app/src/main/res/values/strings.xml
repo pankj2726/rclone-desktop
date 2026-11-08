@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">Pankxu</string>
+
+    <!-- P1-04: arena.ai/agent is the entry point the user supplied; it is also
+         declared as an Allow route in arena.ai/robots.txt (checked 2026-11-08). -->
+    <string name="default_url" translatable="false">https://arena.ai/agent</string>
+
+    <string name="shortcut_agent_short">Agent</string>
+    <string name="shortcut_agent_long">Open Agent</string>
+    <string name="shortcut_chat_short">Chat</string>
+    <string name="shortcut_chat_long">Open Chat</string>
+    <string name="shortcut_sidebyside_short">Compare</string>
+    <string name="shortcut_sidebyside_long">Open Side-by-Side</string>
+    <string name="shortcut_leaderboard_short">Rankings</string>
+    <string name="shortcut_leaderboard_long">Open Leaderboard</string>
+
+    <string name="shortcut_disabled_battle">Battle: route not published on arena.ai; shortcut withheld</string>
+</resources>

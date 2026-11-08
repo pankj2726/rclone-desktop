@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  P2-02 / R6: original mark, drawn for this project. Three bars of different
+  heights (a ranking motif, not anyone's logo). Nothing here is traced from,
+  sampled from, or derived from Arena's branding.
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#FFEDEDF2"
+        android:pathData="M36,62 h10 v18 h-10 z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M49,42 h10 v38 h-10 z" />
+    <path
+        android:fillColor="#FFB9B9CC"
+        android:pathData="M62,52 h10 v28 h-10 z" />
+</vector>

@@ -1,0 +1,51 @@
+# Pankxu
+
+A thin Android container around **arena.ai**, so the site opens as a dedicated app.
+
+Trusted Web Activity (TWA) with a Custom Tabs fallback. No WebView, no injected script,
+no scraping, no credentials handled by the app. The browser engine does the rendering,
+the login and the file handling; this app only supplies an icon, a launcher entry, four
+shortcuts and a URL allow-list.
+
+* Package id: `what.thefcuk.pankxu` (permanent)
+* Version: 1.0.0 (versionCode 10000)
+* minSdk 26, compileSdk/targetSdk 36
+* No permissions requested at all
+
+## Status — read this first
+
+| Area | State |
+|---|---|
+| Source, build files, CI workflows, docs | **written** |
+| Allow-list logic + unit tests | **passing** — 9/9 on a JVM, run 2026-11-08 |
+| Full Gradle/Android build | **not yet run** — no JDK 17 + SDK here; CI runs it |
+| Installed on a device | **not done** — no device or emulator available to the agent |
+| Google login / email OTP verified | **not done** — same reason |
+| Signed with your key | **not done** — requires your keystore |
+
+Nothing in the table above is a claim that it works. See `docs/QA-REPORT.md` for the
+evidence split and `docs/PROGRESS.md` for what is next.
+
+## Layout
+
+```
+app/                     Android module (one activity, one policy class)
+  src/main/java/…        PankxuLauncherActivity, UrlPolicy
+  src/test/java/…        UrlPolicyTest (JVM, no emulator needed)
+  src/main/res/…         icons, shortcuts, theme, network config
+gradle/libs.versions.toml  every version pinned (R11)
+.github/workflows/       build, release, weekly canary
+scripts/                 make-bundle.sh, sign-release.sh
+docs/                    research, decisions, QA, limitations, legal notes
+artifacts/               git bundles and build outputs go here
+```
+
+## Quick start
+
+```bash
+./gradlew :app:assembleDebug          # debug build, unsigned
+./gradlew :app:testDebugUnitTest      # allow-list tests
+./scripts/sign-release.sh             # release signing, needs env vars (see BUILD.md)
+```
+
+Full instructions: `docs/BUILD.md` (build), `docs/INSTALL.md` (install).
