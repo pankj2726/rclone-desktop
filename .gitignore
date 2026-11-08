@@ -24,3 +24,10 @@ target/
 *.aab
 *.ap_
 *.dex
+
+# Generated deliverables live in artifacts/ on disk but never inside git:
+# a bundle committed into the repo contains the previous bundle, so each commit
+# would grow the repository recursively. artifacts/ is snapshotted, dist/build/out
+# are not, so this is exactly where they belong.
+artifacts/*.bundle
+artifacts/*.zip
