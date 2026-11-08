@@ -31,3 +31,10 @@ target/
 # are not, so this is exactly where they belong.
 artifacts/*.bundle
 artifacts/*.zip
+
+# Working downloads (CI artifact zips, extracted APKs). These are never source and never
+# deliverables: the same files live in artifacts/ or on the release page. A batch of them
+# was committed by accident on 2026-11-08 and removed the same day; they remain in history
+# (about 10 MB of pack), which is a size cost, not a disclosure - each one is a public CI
+# artifact. Say the word if you want the history rewritten to reclaim it.
+cache/
