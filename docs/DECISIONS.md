@@ -48,3 +48,8 @@ than none, because the next person deletes it under pressure.
 resolve cannot appear, and licence fields are left empty on purpose: the reviewed list is
 `THIRD-PARTY-NOTICES.md`, and inventing SPDX identifiers from memory would be the same class
 of error as writing verification checksums by hand.
+
+**Outcome:** run 42500068102 generated 272 components and the confirm step passed; the file was
+committed in `9fdf48d` and build 42500268168 stayed green. A deliberate checksum corruption in
+`79fc7da` failed run 42500469892 with `DependencyVerificationException`, which is the evidence
+that the file is enforced rather than ignored; the corruption was reverted in `19af292`.

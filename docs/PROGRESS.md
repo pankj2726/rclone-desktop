@@ -2,6 +2,25 @@
 
 Updated at the end of every phase (R2). Newest at the top.
 
+## 2026-11-08 — v3.1 build published, SBOM and verification metadata closed
+
+* **New APK built from the v3.1 sources.** CI run 42499683401 (commit cb4c36a) then
+  42500268168. Artifact `app-debug.apk`, 4,916,825 bytes, SHA-256
+  `d486a67c1fc87d8ed06f462761da11dc764553d6bbba9241ab9899531abfcea0`, v2 signature.
+  Delivered as `delivery/pankxu-1.0.0-debug-v31.apk` and as an extra asset on the
+  `v1.0.0-debug` release. **This is the build the device pass must use**; the older
+  `pankxu-1.0.0-debug.apk` predates the launch gate and cannot run the PAR tests.
+* **gitleaks fix.** Run 42499631142 failed at the secret scan with `stderr is not empty` — the
+  action cannot scan a shallow clone. `fetch-depth: 0` added; green since.
+* **SBOM (P6-06).** `scripts/sbom.init.gradle` + `scripts/make-sbom.py` produce CycloneDX 1.5
+  from the resolved debug runtime classpath with per-artifact SHA-256. 48 components. Uploaded
+  with every build.
+* **R11 dependency verification closed.** `verification-metadata.yml` run 42500068102 produced
+  272 pinned components; committed; build green (42500268168); a deliberate checksum
+  corruption failed the build (42500469892) and was reverted (19af292).
+* **D-21, D-22** recorded. `docs/LIMITATIONS.md` items for SBOM and verification metadata
+  rewritten to what is actually true.
+
 ## 2026-11-08 — roadmap v3.1 reconciliation
 
 Section 9 supersedes earlier sections, so the app and the paperwork were reworked against it:

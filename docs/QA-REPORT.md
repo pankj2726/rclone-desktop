@@ -107,3 +107,27 @@ Extracted from the APK with `aapt2 dump xmltree`, not read from our source:
 
 No `INTERNET`, no camera, no storage, no location. Analysis and accepted risks:
 `docs/THREAT-MODEL.md`.
+
+## Dependency verification: negative test (R11)
+
+Gradle dependency verification is committed at `gradle/verification-metadata.xml` (272 pinned
+components, `verify-metadata=true`, no bypass mode). Because a verification file that is
+silently ignored looks identical to one that works, it was tested by breaking it on purpose.
+
+| Step | Build | Result |
+|---|---|---|
+| Metadata committed, build run unchanged | 42500268168 | **pass** |
+| One SHA-256 (androidx.activity 1.7.0) edited to a wrong value, no other change | 42500469892 | **fail** — `Dependency verification failed for configuration ':app:debugCompileClasspath'`; `Caused by: DependencyVerificationException` |
+| Corruption reverted | (final build, see PROGRESS) | expected pass |
+
+So the file is load-bearing: an artifact whose bytes differ from the recorded digest stops the
+build before anything is packaged. This is the only claim in this report that was tested by
+deliberately making it fail.
+
+## SBOM (P6-06)
+
+`scripts/sbom.init.gradle` reads the resolved `debugRuntimeClasspath`, hashes each artifact file,
+and `scripts/make-sbom.py` writes CycloneDX 1.5 (`sbom.cdx.json`, 48 components for this build).
+The `build` workflow generates it on every push and uploads it with the artifact. Components
+appear because Gradle resolved them and for no other reason; licence fields are intentionally
+blank (see `THIRD-PARTY-NOTICES.md` for the reviewed list, D-22).
