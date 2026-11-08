@@ -2,6 +2,31 @@
 
 Updated at the end of every phase (R2). Newest at the top.
 
+## 2026-11-08 — roadmap v3.1 reconciliation
+
+Section 9 supersedes earlier sections, so the app and the paperwork were reworked against it:
+
+* **P3-06 rewritten.** Three-way routing (`IN_APP` / `EXTERNAL` / `BLOCK`). Terms, help and
+  Google sign-in open in the browser instead of silently falling back to DEFAULT_URL.
+  10 unit tests, passing on a JVM.
+* **P3-12 / X-10 added.** `LaunchGateActivity` is the sole exported entry: connectivity
+  pre-check with Retry, one-time research disclosure, then routing.
+* **X-02 / X-03 added.** Unofficial-client notice and Arena's research-collection disclosure,
+  in the app and in the README.
+* **P6-03 rewritten.** PRIVACY.md now states what Arena collects about prompts, not just what
+  the app does not.
+* **P7-04 corrected.** Canary records blocked/challenged responses as Unknown and runs monthly.
+* **X-21 added.** gitleaks runs first in every build.
+* **X-01 / X-24 added.** LICENSE (MIT, code only), THIRD-PARTY-NOTICES.md, SECURITY.md.
+* **X-17 / X-18 / X-19 written.** docs/KEY-MANAGEMENT.md with a backup-restore test and a
+  v3-lineage rotation procedure.
+* **9.3 / 9.12 tracked.** PAR-01..12 and N-01..N-10 exist as Unverified rows; status summary
+  in docs/DOD-V31.md.
+* **D-19.** No further scripted fetches of arena.ai. Site facts come from user capture only.
+
+**CI:** build run 42499447209 green with the new gate activity, the first-run dialog and
+gitleaks. Merged manifest reviewed component by component (docs/THREAT-MODEL.md).
+
 ## 2026-11-08 — artefacts published
 
 * **`v1.0.0-unsigned`** — R8 release build, 196 920 bytes, unsigned by design, SHA-256 verified
