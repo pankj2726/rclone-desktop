@@ -23,6 +23,14 @@ else
     echo "   already set"
 fi
 
+echo "== git remote (also dropped with .git/config) =="
+if ! git remote get-url origin >/dev/null 2>&1; then
+    git remote add origin "${REPO_URL:-https://github.com/pankj2726/rclone-desktop.git}"
+    echo "   origin re-added: $(git remote get-url origin)"
+else
+    echo "   already present: $(git remote get-url origin)"
+fi
+
 echo "== line endings guard =="
 git config core.autocrlf false 2>/dev/null || true
 
