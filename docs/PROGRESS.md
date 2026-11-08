@@ -2,6 +2,33 @@
 
 Updated at the end of every phase (R2). Newest at the top.
 
+## 2026-11-08 — first device run (Samsung SM-G9900, Android 12)
+
+Installed CI artifacts on a real handset over adb and worked through the QA report. The app
+had never run anywhere before this.
+
+**Three defects found and fixed, each now guarded by CI:**
+
+1. **It crashed on launch.** `androidbrowserhelper` 2.7.4 requires the app to declare
+   `ManageDataLauncherActivity` and does not declare it itself; `LauncherActivity.launchTwa()`
+   throws `IllegalArgumentException` without it. Declared, and `scripts/check-manifest.py`
+   added to the build. **Every release so far had this bug.**
+2. **The gate was invisible in light mode.** `Theme.Material` (dark) paired with a white
+   background: white text on white. Light parent in `values/`, dark kept in `values-night/`.
+3. **Shortcuts could not start.** `targetPackage` was hard-coded to the release id, so the
+   debug build failed with `ActivityNotFoundException`; omitting it produced a chooser instead.
+   Now per build type, verified inside the packaged APK by `scripts/check-shortcuts.py`.
+
+**Added:** the gate names the Custom Tab fallback when no TWA provider is installed (D-25),
+instead of silently degrading.
+
+**Verified on the device:** install, first-run disclosure, in-app routing of arena.ai,
+external routing, seven blocked schemes, all four shortcuts, PAR-02/04/06/09/11.
+**Still unverified:** real TWA (no Chrome on the device, and Play cannot install it with zero
+Google accounts), offline pre-check (the simulator kept its network up), sign-in, prompts.
+
+Evidence: `docs/qa-evidence/device-2026-11-08/` (README, screenshots, crash trace, matrices).
+
 ## 2026-11-08 — v3.1 build published, SBOM and verification metadata closed
 
 * **New APK built from the v3.1 sources.** CI run 42499683401 (commit cb4c36a) then
