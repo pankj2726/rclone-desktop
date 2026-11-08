@@ -12,6 +12,7 @@ runtime. This check turns that class of bug into a build failure.
 Input is `aapt2 dump xmltree --file AndroidManifest.xml <apk>`, the format the
 build workflow already produces.
 """
+import pathlib
 import re
 import sys
 
@@ -78,6 +79,20 @@ def main(path):
         failures.append(f"missing permission: {perm}")
     for perm in sorted(FORBIDDEN_PERMISSIONS & perms):
         failures.append(f"unexpected permission: {perm} (the app must not hold INTERNET)")
+
+    # Hard-coded shortcut targets break the debug build, which has applicationId
+    # ...pankxu.debug. The launcher then logs "Shortcut could not be started".
+    shortcuts = "app/src/main/res/xml/shortcuts.xml"
+    if pathlib.Path(shortcuts).exists():
+        body = pathlib.Path(shortcuts).read_text(encoding="utf-8")
+        # Strip comments first: the file documents this rule in prose, and matching
+        # the prose made the guard fail on a correct file (caught while adding it).
+        body = re.sub(r"<!--.*?-->", "", body, flags=re.S)
+        if re.search(r"android:targetPackage\s*=", body):
+            failures.append(
+                f"{shortcuts}: android:targetPackage hard-codes one applicationId; "
+                "omit it so the platform uses the owning app's package"
+            )
 
     print(f"activities declared: {len(names)}")
     for name in sorted(names):

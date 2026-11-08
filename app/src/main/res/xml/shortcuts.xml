@@ -3,6 +3,13 @@
   P3-08. Four shortcuts, every URL taken from arena.ai/robots.txt (P1-04) —
   no invented routes. "Battle" is deliberately absent: no /battle route exists
   in robots.txt and no href to one appears on the home page (see DECISIONS.md D-02).
+
+  android:targetPackage is deliberately NOT set. Hard-coding it bound the shortcut to
+  the release applicationId, so on the debug build the launcher logged
+  "ActivityNotFoundException: Shortcut could not be started" and nothing opened
+  (device evidence: docs/qa-evidence/device-2026-11-08/15-shortcut-tap-result.png).
+  With only targetClass set, the platform uses the package of the app that owns the
+  shortcut, which is correct for both the .debug and release builds.
 -->
 <shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
 
@@ -13,7 +20,6 @@
         android:shortcutLongLabel="@string/shortcut_agent_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="what.thefcuk.pankxu"
             android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/agent" />
     </shortcut>
@@ -25,7 +31,6 @@
         android:shortcutLongLabel="@string/shortcut_chat_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="what.thefcuk.pankxu"
             android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/chat" />
     </shortcut>
@@ -37,7 +42,6 @@
         android:shortcutLongLabel="@string/shortcut_sidebyside_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="what.thefcuk.pankxu"
             android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/side-by-side" />
     </shortcut>
@@ -49,7 +53,6 @@
         android:shortcutLongLabel="@string/shortcut_leaderboard_long">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetPackage="what.thefcuk.pankxu"
             android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/leaderboard" />
     </shortcut>
