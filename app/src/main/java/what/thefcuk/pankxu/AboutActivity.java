@@ -3,6 +3,8 @@ package what.thefcuk.pankxu;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -34,8 +36,7 @@ public class AboutActivity extends Activity {
         setContentView(R.layout.activity_about);
 
         TextView version = findViewById(R.id.about_version);
-        version.setText(getString(R.string.about_version_format, BuildConfig.VERSION_NAME,
-                BuildConfig.VERSION_CODE));
+        version.setText(buildVersionLine());
 
         Button privacy = findViewById(R.id.about_privacy);
         privacy.setOnClickListener(v -> openExternally(PRIVACY_URL));
@@ -76,9 +77,9 @@ public class AboutActivity extends Activity {
     private String buildDiagnostics() {
         StringBuilder sb = new StringBuilder();
         sb.append("Pankxu diagnostics\n");
-        sb.append("app version: ").append(BuildConfig.VERSION_NAME)
-                .append(" (").append(BuildConfig.VERSION_CODE).append(")\n");
-        sb.append("package: ").append(BuildConfig.APPLICATION_ID).append('\n');
+        sb.append("app version: ").append(versionName()).append(" (")
+                .append(versionCode()).append(")\n");
+        sb.append("package: ").append(getPackageName()).append('\n');
         sb.append("android: ").append(Build.VERSION.RELEASE)
                 .append(" (sdk ").append(Build.VERSION.SDK_INT).append(")\n");
         sb.append("device: ").append(Build.MANUFACTURER).append(' ').append(Build.MODEL).append('\n');
@@ -89,6 +90,35 @@ public class AboutActivity extends Activity {
                 .append('\n');
         sb.append("privacy: ").append(PRIVACY_URL).append('\n');
         return sb.toString();
+    }
+
+    /**
+     * Reads the version from the installed package rather than BuildConfig: AGP 9 stopped
+     * generating BuildConfig by default, and a build flag is one more thing that can drift
+     * between the IDE and CI.
+     */
+    @SuppressWarnings("deprecation")
+    private PackageInfo packageInfo() {
+        try {
+            return getPackageManager().getPackageInfo(getPackageName(), 0);
+        } catch (PackageManager.NameNotFoundException e) {
+            return null;
+        }
+    }
+
+    private String versionName() {
+        PackageInfo info = packageInfo();
+        return info == null || info.versionName == null ? "unknown" : info.versionName;
+    }
+
+    @SuppressWarnings("deprecation")
+    private long versionCode() {
+        PackageInfo info = packageInfo();
+        return info == null ? 0L : info.getLongVersionCode();
+    }
+
+    private String buildVersionLine() {
+        return getString(R.string.about_version_format, versionName(), versionCode());
     }
 
     private void openExternally(String url) {
