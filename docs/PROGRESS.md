@@ -2,6 +2,14 @@
 
 Updated at the end of every phase (R2). Newest at the top.
 
+## 2026-11-08 — artefacts published
+
+* **`v1.0.0-unsigned`** — R8 release build, 196 920 bytes, unsigned by design, SHA-256 verified
+  after round-tripping through GitHub. Full details in `docs/PUBLISHED.md`.
+* **`v1.0.0-debug`** — installable debug build for the Phase 4 device pass.
+* Signed release still blocked on the owner's keystore. Four repository secrets required.
+* Google Play: not attempted, reasons recorded in `docs/PUBLISHED.md`.
+
 ## 2026-11-08 — repository published, first CI runs
 
 **Published:** https://github.com/pankj2726/rclone-desktop (private, branch `main`).
