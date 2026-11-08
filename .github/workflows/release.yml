@@ -6,7 +6,10 @@ name: release
 # with the runner.
 on:
   push:
-    tags: [ 'v*' ]
+    # Strict release tags only. A bare 'v*' pattern also matched v1.0.0-debug and
+    # v1.0.0-unsigned, which fired this signed pipeline at tags that are not
+    # releases (observed: run 42488977376 failed on the missing keystore, correctly).
+    tags: [ 'v[0-9]+.[0-9]+.[0-9]+' ]
   workflow_dispatch:
 
 permissions:
