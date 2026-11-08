@@ -2,6 +2,20 @@
 
 Updated at the end of every phase (R2). Newest at the top.
 
+## 2026-11-08 — repository published, first CI runs
+
+**Published:** https://github.com/pankj2726/rclone-desktop (private, branch `main`).
+
+CI history so far, each failure fixed rather than worked around:
+
+| run | failure | fix |
+|---|---|---|
+| 42488344472 | `android-actions/setup-android@v3` exits 1: `Failed to find package 'tools'` | use the runner's preinstalled SDK (D-13) |
+| 42488423911 | `checkDebugAarMetadata`: androidx.core 1.19.1 needs compileSdk 37 | dependency was unused; removed (D-14) |
+| next | see below | |
+
+Gate G0 is **not yet met** — no green build so far.
+
 ## 2026-11-08 — Phases 0-3 (partial), Phase 7 workflows, docs
 
 **Done**

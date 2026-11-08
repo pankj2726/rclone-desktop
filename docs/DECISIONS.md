@@ -20,3 +20,5 @@ before work starts.
 | D-12 | `artifacts/*.bundle` and `artifacts/*.zip` are git-ignored | Committing a bundle puts the previous bundle inside the new one; the repository grows recursively on every commit. `artifacts/` is snapshotted, `dist`/`build`/`out` are not, so they belong on disk and out of history | implemented |
 
 | D-13 | CI uses the runner's preinstalled Android SDK; `android-actions/setup-android` removed | First CI run (42488344472) failed inside that action: it runs `sdkmanager tools`, and the `tools` package no longer exists, so it exits 1 before any of our steps. Fewer third-party actions is also better for R11 | implemented |
+
+| D-14 | `androidx.core` removed from dependencies | CI run 42488423911 failed at `:app:checkDebugAarMetadata`: `androidx.core:core:1.19.1` requires compileSdk 37, and nothing in this app imports androidx.core at all. Removing an unused dependency beats raising compileSdk for no reason. Its transitive copy still arrives via androidbrowserhelper | implemented |

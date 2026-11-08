@@ -69,7 +69,6 @@ tasks.withType<JavaCompile>().configureEach {
 dependencies {
     implementation(libs.androidx.browser)
     implementation(libs.androidbrowserhelper)
-    implementation(libs.androidx.core)
 
     testImplementation(libs.junit)
 }

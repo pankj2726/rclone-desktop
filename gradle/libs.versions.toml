@@ -1,15 +1,15 @@
-# R11 — every version pinned. Nothing uses a dynamic range.
+# R11 -- every version pinned. Nothing uses a dynamic range.
+# androidx.core is deliberately absent: nothing in this app imports it, and 1.19.1
+# demands compileSdk 37 (see DECISIONS D-14). Add it back only with a real use.
 [versions]
 agp = "9.5.1"
 androidxBrowser = "1.10.0"
 androidbrowserhelper = "2.7.4"
-androidxCore = "1.19.1"
 junit = "4.13.2"
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "androidxBrowser" }
 androidbrowserhelper = { module = "com.google.androidbrowserhelper:androidbrowserhelper", version.ref = "androidbrowserhelper" }
-androidx-core = { module = "androidx.core:core", version.ref = "androidxCore" }
 junit = { module = "junit:junit", version.ref = "junit" }
 
 [plugins]
