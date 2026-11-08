@@ -1,9 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  P3-03: no <uses-permission> entries at all. The TWA hands upload, camera and
-  microphone work to the browser, which already holds those grants.
+  P3-03 as amended by v3.1: no runtime permissions. The TWA hands upload, camera and
+  microphone work to the browser, which already holds those grants. One normal-level
+  permission is declared for the offline pre-check (P3-12).
 -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      ACCESS_NETWORK_STATE is a normal, auto-granted permission: it gates the P3-12
+      offline pre-check (ConnectivityManager) and cannot read user data. It is the only
+      permission the app declares, and it is not a runtime prompt.
+    -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
         android:allowBackup="false"
@@ -23,8 +31,9 @@
           so verification would fail and the attribute would only produce noise.
           Turn it on after Arena publishes an asset statement (Phase 5).
         -->
+        <!-- Exported entry point. Validates, gates and routes before anything loads. -->
         <activity
-            android:name=".PankxuLauncherActivity"
+            android:name=".LaunchGateActivity"
             android:exported="true"
             android:theme="@style/Theme.Pankxu">
 
@@ -33,13 +42,24 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
 
-            <!-- Inbound arena.ai links. The host is concrete, never a wildcard. -->
+            <!-- Inbound arena.ai links. Concrete host, never a wildcard. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="arena.ai" />
             </intent-filter>
+
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
+        </activity>
+
+        <!-- The TWA. Not exported: reachable only through the gate. -->
+        <activity
+            android:name=".PankxuLauncherActivity"
+            android:exported="false"
+            android:theme="@style/Theme.Pankxu">
 
             <meta-data
                 android:name="android.support.customtabs.trusted.DEFAULT_URL"
@@ -65,10 +85,6 @@
                 android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
                 android:value="customtabs" />
 
-            <!-- P3-08 -->
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
         </activity>
 
     </application>

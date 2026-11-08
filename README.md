@@ -1,5 +1,18 @@
 # Pankxu
 
+> **Unofficial client.** Not affiliated with, endorsed by, or supported by Arena. This is a
+> personal launcher that opens arena.ai in your browser engine.
+>
+> **Install only from this repository's [Releases](../../releases) page.** Third-party APK
+> mirrors and unrelated store listings using similar names are not from this project. Every
+> release publishes the APK's SHA-256 **and** the signing certificate's SHA-256 fingerprint —
+> verify both before installing (`docs/INSTALL.md`). A build whose certificate does not match
+> the published fingerprint is not ours.
+>
+> **What Arena collects:** Arena's FAQ states that Side-by-Side and Direct prompts are
+> collected for research, that those modes do not count as leaderboard votes, and that shared
+> data is de-identified. Read `docs/PRIVACY.md` before using real content.
+
 A thin Android container around **arena.ai**, so the site opens as a dedicated app.
 
 Trusted Web Activity (TWA) with a Custom Tabs fallback. No WebView, no injected script,

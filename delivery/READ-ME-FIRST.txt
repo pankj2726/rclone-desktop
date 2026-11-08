@@ -1,0 +1,48 @@
+PANKXU 1.0.0 — DEBUG BUILD
+=========================
+
+pankxu-1.0.0-debug.apk      4,906,811 bytes
+SHA-256                     e185a41f987da7c7e2f7ce07709d10e98714e8eaacdbeac9bb11d75b6dbbe673
+Package                     what.thefcuk.pankxu
+Version                     1.0.0 (versionCode 10000)
+minSdk 26 · targetSdk 36 · compileSdk 36
+Signed with                 the Android DEBUG key (v2 APK Signature Scheme)
+
+WHAT THIS IS
+  A working, installable build of the app. It opens arena.ai/agent in a
+  Chrome-backed Trusted Web Activity, with a Custom Tab fallback.
+
+WHAT IT IS NOT
+  - NOT signed with your release key.
+  - NOT a Play Store submission.
+  - NOT tested on any device. Nobody has installed it yet.
+
+INSTALL
+  1. Copy the APK to the phone (USB, Drive, whichever).
+  2. Tap it. Allow "Install unknown apps" for whichever app is doing the
+     installing (Files, Chrome, etc.).
+  3. Play Protect will warn about an unknown developer. That is expected for
+     any sideloaded app; choose "Install anyway".
+  4. Open it.
+
+EXPECT A URL BAR. arena.ai publishes an empty /.well-known/assetlinks.json,
+so no app can claim a verified association with the domain. Full-screen needs
+Arena to publish an asset statement.
+
+VERIFY THE FILE FIRST (optional, needs a terminal)
+  sha256sum -c SHA256SUMS.txt          ->  pankxu-1.0.0-debug.apk: OK
+
+IMPORTANT BEFORE YOU LATER INSTALL A RELEASE BUILD
+  This APK is signed with a throwaway debug key. A build signed with YOUR
+  release key has the same package name but a different signer, so Android
+  will refuse to install it over this one. Uninstall this first:
+      adb uninstall what.thefcuk.pankxu
+  or Settings -> Apps -> Pankxu -> Uninstall.
+  You lose nothing: the app stores no data of its own.
+
+WHAT TO TEST
+  docs/QA-REPORT.md in the repository, rows 4-01 to 4-12.
+  Row 4-12 is the security check:
+      adb shell am start -a android.intent.action.VIEW \
+        -d "https://evil.com" what.thefcuk.pankxu
+  Evil.com must NOT load inside the app.

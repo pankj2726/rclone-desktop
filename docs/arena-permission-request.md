@@ -22,6 +22,24 @@ Two things I would like to ask:
    - Package name: `what.thefcuk.pankxu`
    - SHA-256 signing certificate fingerprint: *(to be inserted once the release key exists)*
 
+   The exact file we would ask you to serve at
+   `https://arena.ai/.well-known/assetlinks.json` — you may of course word or scope it however
+   you prefer:
+
+   ```json
+   [{
+     "relation": ["delegate_permission/common.handle_all_urls"],
+     "target": {
+       "namespace": "android_app",
+       "package_name": "what.thefcuk.pankxu",
+       "sha256_cert_fingerprints": ["<RELEASE_CERT_SHA256_FINGERPRINT>"]
+     }
+   }]
+   ```
+
+   If you would rather we did not appear in that file at all, that is a complete answer and
+   the app continues to work with a visible URL bar.
+
 2. **Terms.** Your Terms prohibit "framing or using framing techniques." I read that as
    directed at iframe-style embedding, which your `X-Frame-Options: SAMEORIGIN` and CSP
    `frame-ancestors` already prevent — and which a Trusted Web Activity does not do. Could you

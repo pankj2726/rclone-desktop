@@ -1,0 +1,61 @@
+name: verification-metadata
+
+# R11 / P3-01 ask for gradle/verification-metadata.xml so that every dependency is
+# checked against a known SHA-256. That file can only be produced by resolving the real
+# dependency graph, which needs a JDK, the Android SDK and network access — none of which
+# the authoring environment had. This workflow generates it so the result can be reviewed
+# and committed deliberately, rather than being fabricated.
+#
+# After committing the file, set `dependency.verification.mode=strict` in
+# gradle/verification-metadata.xml (the Gradle task writes it with an explicit mode) and
+# the build will fail on any unverified artifact.
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  generate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Locate the preinstalled Android SDK
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+
+      - name: Install pinned platform and build-tools
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Generate verification metadata
+        run: |
+          set -euo pipefail
+          ./gradlew --no-daemon --write-verification-metadata sha256 \
+            :app:dependencies help
+          echo "--- generated ---"
+          ls -l gradle/verification-metadata.xml
+          printf 'components pinned: %s\n' "$(grep -c '<component ' gradle/verification-metadata.xml || true)"
+
+      - name: Confirm the build still passes with verification on
+        run: ./gradlew --no-daemon :app:assembleDebug
+
+      - name: Upload for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: verification-metadata
+          path: gradle/verification-metadata.xml

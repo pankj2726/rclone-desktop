@@ -14,7 +14,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="what.thefcuk.pankxu"
-            android:targetClass="what.thefcuk.pankxu.PankxuLauncherActivity"
+            android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/agent" />
     </shortcut>
 
@@ -26,7 +26,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="what.thefcuk.pankxu"
-            android:targetClass="what.thefcuk.pankxu.PankxuLauncherActivity"
+            android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/chat" />
     </shortcut>
 
@@ -38,7 +38,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="what.thefcuk.pankxu"
-            android:targetClass="what.thefcuk.pankxu.PankxuLauncherActivity"
+            android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/side-by-side" />
     </shortcut>
 
@@ -50,7 +50,7 @@
         <intent
             android:action="android.intent.action.VIEW"
             android:targetPackage="what.thefcuk.pankxu"
-            android:targetClass="what.thefcuk.pankxu.PankxuLauncherActivity"
+            android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
             android:data="https://arena.ai/leaderboard" />
     </shortcut>
 

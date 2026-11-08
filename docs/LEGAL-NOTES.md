@@ -49,3 +49,50 @@ no Arena marks anywhere in the app, the icon, or any listing.
 
 If Arena objects, states that wrapping requires permission, or changes the Terms, distribution
 stops until the user decides (section 6 escalation trigger).
+
+
+---
+
+## v3.1 additions
+
+### Data-protection position (X-04)
+
+**v1 collects no personal data.** It has no server, no analytics, no crash reporting and no
+account of its own. It holds one boolean locally (the research disclosure was acknowledged)
+and whatever the TWA library keeps on-device for its browser session. Nothing is transmitted
+to the project owner, because there is no project server to transmit to.
+
+Two consequences:
+
+* **GDPR / DPDP Act (India) analysis is not triggered by this app**, because it is not a data
+  controller for anything. Arena is the controller for everything you type into the site.
+* **If that ever changes** — an API client module, analytics, crash reporting, any backend —
+  the position changes immediately and must be re-assessed before shipping, not after. A
+  feature that adds telemetry turns a no-data app into a controller with obligations
+  (lawful basis, retention, subject rights, breach notification). Recorded here so it cannot
+  be added casually.
+
+### Age requirements (X-05)
+
+Arena's Terms of Use were re-read on 2026-11-08. **A specific minimum age was not stated in
+the text retrieved**, so it cannot be recorded as fact. What follows from the Terms as read:
+the service is offered to users who can form a binding agreement, and users under the age of
+majority require involvement of a parent or guardian.
+
+**Consequence for this app:** there is no age gate, by design — the age contract is between
+the user and Arena when they sign in, exactly as it would be in a browser. If Arena later
+publishes a numeric minimum, record it here and consider whether a launcher should surface it.
+
+### Unofficial-client status (X-02)
+
+Stated in the README, in the app's first-run screen footer (`unofficial_notice`), and here:
+this project is unofficial, unaffiliated, and claims no rights in Arena's marks. It exists for
+the repository owner's own use. Distribution beyond that is a decision that needs Arena's
+written answer — see `arena-permission-request.md`.
+
+### Incident plan if Arena objects (X-23)
+
+If Arena asks for the app to stop: mark every GitHub release as withdrawn, replace the README
+with a notice, leave the source in place (it is the owner's code and its history is the
+record), and stop publishing builds. Do not delete the repository — quietly removing it looks
+worse than complying openly, and the audit trail is the point.

@@ -22,3 +22,10 @@ before work starts.
 | D-13 | CI uses the runner's preinstalled Android SDK; `android-actions/setup-android` removed | First CI run (42488344472) failed inside that action: it runs `sdkmanager tools`, and the `tools` package no longer exists, so it exits 1 before any of our steps. Fewer third-party actions is also better for R11 | implemented |
 
 | D-14 | `androidx.core` removed from dependencies | CI run 42488423911 failed at `:app:checkDebugAarMetadata`: `androidx.core:core:1.19.1` requires compileSdk 37, and nothing in this app imports androidx.core at all. Removing an unused dependency beats raising compileSdk for no reason. Its transitive copy still arrives via androidbrowserhelper | implemented |
+
+| D-15 | **Roadmap v3.1 section 9 supersedes earlier sections.** Allow-list is now three-way (IN_APP / EXTERNAL / BLOCK); a LaunchGateActivity owns the exported surface | 9.2 row 5 requires help.arena.ai, Terms and Privacy to open externally. The library's default would have silently redirected an untrusted URL to DEFAULT_URL, i.e. a Terms link would land the reader on the agent page | implemented |
+| D-16 | The TWA activity is no longer exported; the gate is the only entry | Keeps every inbound intent behind one validated path, and makes P3-12 and X-03 possible in one place | implemented |
+| D-17 | `ACCESS_NETWORK_STATE` added | P3-12 requires an offline pre-check. Normal-level, auto-granted, cannot read user data. Reverses the earlier "zero permissions" claim, which is now stated precisely instead | implemented |
+| D-18 | Canary records blocked/challenged as **Unknown**, runs monthly | 9.2: bot challenges must not raise false alarms. Monthly matches the roadmap's human monthly capture better than weekly | implemented |
+| D-19 | No scripted fetching of arena.ai from now on | 9.1 item 1 and 9.4. Earlier fetches succeeded (recorded 2026-11-08 in docs/research/) but repeated automated access is exactly what the site blocks and the Terms prohibit. Site facts now come from user capture only | implemented |
+| D-20 | `LICENSE` is MIT for this repo's code only | X-01. Explicitly grants nothing in Arena's marks or content | implemented |

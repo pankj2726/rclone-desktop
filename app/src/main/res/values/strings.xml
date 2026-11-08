@@ -15,5 +15,22 @@
     <string name="shortcut_leaderboard_short">Rankings</string>
     <string name="shortcut_leaderboard_long">Open Leaderboard</string>
 
+
+    <!-- v3.1 X-02 / X-03 -->
+    <string name="unofficial_notice" translatable="false">Unofficial client. Not affiliated with or endorsed by Arena.</string>
+    <string name="gate_disclosure_title">Before you start</string>
+    <string name="gate_disclosure_body">This is an unofficial client that shows arena.ai in your browser.
+
+Arena\'s FAQ states that prompts in Side-by-Side and Direct modes are collected for research, that those modes do not count as leaderboard votes, and that publicly shared or provider-shared data is de-identified. Your chats are governed by Arena\'s own privacy policy, not by this app.
+
+This app collects nothing. Use test prompts containing no personal data while evaluating it.</string>
+    <string name="gate_disclosure_ok">I understand</string>
+    <string name="gate_disclosure_privacy">Arena privacy policy</string>
+    <string name="gate_offline">No internet connection. Connect and try again.</string>
+    <string name="gate_retry">Retry</string>
+    <string name="gate_rejected">That link is not supported.</string>
+    <string name="gate_no_browser">No browser installed to open this link.</string>
+    <string name="gate_checking">Opening arena.ai…</string>
+
     <string name="shortcut_disabled_battle">Battle: route not published on arena.ai; shortcut withheld</string>
 </resources>

@@ -1,37 +1,52 @@
 # Privacy
 
-## Short version
+## What this app collects
 
-This app collects nothing. No analytics, no telemetry, no crash reporting, no advertising,
-no accounts of its own, no permissions.
+**Nothing.** No analytics, no telemetry, no crash reporting, no advertising, no accounts of
+its own, no server component. It has no storage beyond what Android gives every app, and it
+reads no device data.
 
-## What the app does with data
+It does hold two things locally, both invisible and both on-device only:
 
-Nothing. It has no storage of its own beyond the Android defaults, requests no permissions,
-and does not read, write or transmit any device data. Its entire behaviour is: open an
-`https://arena.ai/…` URL in a browser instance on the device.
+* a boolean saying the one-time research disclosure has been acknowledged;
+* whatever SharedPreferences the TWA library keeps internally for its browser session token.
 
-## What the site does
+Neither leaves the device, and `allowBackup=false` keeps Android from syncing them to a
+Google account.
 
-Everything you do inside the app happens on arena.ai, in the browser engine, under Arena's
-own privacy policy and cookies. That includes your account, your chats, your uploads and
-your session. This app neither sees nor stores any of it.
+## What Arena collects — and this matters
 
-Because the app has `allowBackup=false`, Android never copies its (empty) data into cloud
-backups.
+You are using **arena.ai**, not this app. Arena's own FAQ (checked 2026-11-08 at
+`arena.ai/de/faq`) states that:
+
+* prompts in **Side-by-Side** and **Direct** modes are **collected for research**;
+* those two modes **do not count as leaderboard votes** (Direct has no voting at all);
+* data shared publicly, or with model providers, is **de-identified**.
+
+So the useful mental model is: this app is a window, Arena is the service, and everything you
+type goes to Arena under Arena's privacy policy. The app shows this in a one-time disclosure
+on first launch, with a link to Arena's privacy page.
+
+**Practical advice while evaluating the app:** use prompts containing no personal data, no
+credentials, no client material. See also `docs/LEGAL-NOTES.md`.
+
+## What the browser collects
+
+The page renders inside Chrome (or whichever browser provides the Trusted Web Activity). That
+browser's own history, cookies, sync and permission model apply. The app cannot read any of it.
 
 ## Permissions
 
-None. Camera, microphone, file access, notifications, location: not requested. When the site
-needs one of these, the browser handles the prompt under its own permissions, and you can
-revoke it in Chrome's settings.
+One declared permission: `ACCESS_NETWORK_STATE`. It is normal-level, auto-granted, and used
+solely to show the offline "Retry" screen instead of a blank browser error. It cannot read
+user data. No camera, microphone, storage, location or contacts permission is requested — when
+the site needs those, the **browser** prompts, under the browser's own grants.
 
 ## Removing your data
 
-Uninstalling the app removes nothing of yours, because it holds nothing. To remove site data,
-sign out or clear data inside arena.ai / your browser.
+Uninstalling the app removes nothing of yours, because it holds nothing of yours. To clear site
+data, sign out or clear data inside arena.ai / your browser.
 
 ## Contact
 
-The app is built for personal use by its owner. There is no server component and no data
-collection to report.
+There is no data collection to report. For vulnerabilities, see `SECURITY.md`.

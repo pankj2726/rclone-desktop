@@ -32,3 +32,36 @@ Legend: **Supported** = implemented and evidenced. **Partial** = works with a st
 
 Every "Supported" row above is either a code fact checked in this repo or a route checked
 against arena.ai on 2026-11-08. No row claims a device test that was not run (R7).
+
+---
+
+## Arena parity checklist (v3.1 section 9.3)
+
+Every row is **Unverified**: no device has run this build. Nothing here is marked Pass without
+evidence, per R7. Fill these in from the device pass; the evidence goes in `docs/qa-evidence/`.
+
+| ID | Area | What is known | Status |
+|---|---|---|---|
+| PAR-01 | Battle | Two anonymous responses, vote, identities revealed afterwards (third-party source, unconfirmed) | Unverified |
+| PAR-02 | Side-by-Side | Pick two named models; not counted in public rankings (Arena FAQ) | Unverified |
+| PAR-03 | Direct | One chosen model, no voting, prompts collected for research (Arena FAQ) | Unverified |
+| PAR-04 | Agent | `arena.ai/agent`, experiment label, web search, image gen, file upload, coding sandbox (help centre) | Unverified |
+| PAR-05 | Use cases | Chat, build apps/sites, write and edit, search, images, video, choose model, compare | Unverified |
+| PAR-06 | Leaderboards | 14 categories listed in the FAQ: Overall, Agent, Alignment Index, Text, WebDev, Image-to-WebDev, Text to Image, Image Edit, Text to Video, Image to Video, Video Edit, Vision, Document, Search | Unverified |
+| PAR-07 | Account | Google or email OTP sign-up; history and recovery | Unverified |
+| PAR-08 | Uploads and media | File and image input; image and video output | Unverified |
+| PAR-09 | Legal and consent | Terms, Privacy, Cookies pages; consent prompt appears once and is dismissable | Unverified |
+| PAR-10 | Localization | Locale-prefixed paths exist (e.g. `/de/faq`) | Unverified |
+| PAR-11 | Help | Help centre and FAQ links open in the external browser | **Partial** — routing for non-`arena.ai` https is now coded and unit-tested (`EXTERNAL`), but not observed on a device |
+| PAR-12 | Changes over time | Changelogs listed in the site footer (to confirm) | Unverified |
+
+### Routing behaviour that *is* testable without a device
+
+| Behaviour | Status | Evidence |
+|---|---|---|
+| `https://arena.ai/...` loads in the TWA | **Supported** | `UrlPolicyTest`, 10/10 passing 2026-11-08 |
+| `https://help.arena.ai/...` opens in the external browser | **Supported** | same tests, `EXTERNAL` decision |
+| Google sign-in origin opens in the browser | **Supported** | same tests |
+| `http://`, `intent:`, `javascript:`, `file:`, `content:`, `data:`, `tel:`, `mailto:` refused | **Supported** | same tests, `BLOCK` decision |
+| Lookalike hosts never load in-app | **Supported** | `arena.ai.evil.com`, `notarena.ai`, `arena.ai@evil.com` all `EXTERNAL` or `BLOCK` |
+| Offline shows a Retry screen | **Partial** — coded (`LaunchGateActivity`), compiled only in CI, never seen running |

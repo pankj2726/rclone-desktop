@@ -17,6 +17,10 @@ permissions:
 
 jobs:
   release:
+    # X-20: attach this job to a protected environment with required reviewers so a
+    # signed build cannot happen without a human approving it. Create the environment in
+    # Settings -> Environments -> "release" and add yourself as a required reviewer.
+    environment: release
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
