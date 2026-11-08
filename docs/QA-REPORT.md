@@ -169,3 +169,19 @@ statement was accurate; this is what verification buys.
 * Sending an actual prompt (PAR-01, PAR-03, PAR-08) — deliberately not done.
 * Link verification — `pm get-app-links` reports `arena.ai` **Disabled**, as expected without an
   `assetlinks.json` statement; `autoVerify` stays off.
+
+## S2-05 accessibility and locale pass — 2026-11-08, device D1
+
+Run on build `pankxu-1.0.0-debug-v40.apk`
+(`e25d7da45c614f8e26b71bcef85ea7daf1528d9b58d602e18f471315d79d0ee5`).
+
+| Check | Result | Evidence |
+|---|---|---|
+| Largest system font (1.5x) | **Pass** — all five gate elements still laid out, nothing clipped, buttons still tappable | `28-large-font-1.5x.png` |
+| Dark mode (`cmd uimode night yes`) | **Pass** — black background, light text, both buttons legible | `29-dark-mode.png` |
+| Light mode | **Pass** — this is the D-24 fix, regression-checked here | `25-gate-with-about.png` |
+| Non-English locale (device is zh-HK) | **Pass for layout, app strings remain English** — no truncation or overlap observed; the app deliberately ships English-only for v1.0.0 | all captures |
+| TalkBack | **Unverified** — not exercised; would need enabling the screen reader and walking the gate | — |
+| RTL (ar-EG) | **Unverified** — Android 12 has no `wm set-locale`, and `debug.force_rtl` cannot be set on a production build, so this device cannot force an RTL layout. `supportsRtl="true"` is declared and the layouts use start/end-safe attributes, but that is design evidence, not a test | — |
+
+Both failures in this area would be release blockers if they had occurred; neither did.
