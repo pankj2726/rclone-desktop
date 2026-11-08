@@ -1,0 +1,34 @@
+PANKXU - WHICH APK TO INSTALL  (updated 2026-11-08, after the device pass)
+=======================================================================
+
+  pankxu-1.0.0-debug-v36.apk      <-- INSTALL THIS ONE
+      SHA-256 5895069beff2d8b0fe64b0e01598ef98d647fbf7bbdf6c8da6be818772f15c67
+      The first build that has run on a real phone. Fixes three defects found there:
+      it crashed on launch, the gate screen was white-on-white, and the shortcuts
+      could not start on the debug build.
+
+  Everything else in this folder is superseded:
+      pankxu-1.0.0-debug.apk       crashes as soon as arena.ai should open
+      pankxu-1.0.0-debug-v31.apk   same crash
+      pankxu-1.0.0-debug-v32/33/34/35.apk   intermediate fixes, each superseded
+                                           by the next within minutes; v36 is the one
+                                           that passed rotation, back navigation and
+                                           five open/close cycles
+
+Install:
+      adb install pankxu-1.0.0-debug-v36.apk
+  or
+      adb install -r pankxu-1.0.0-debug-v36.apk
+  If it refuses with "signatures do not match", uninstall the old one first:
+      adb uninstall what.thefcuk.pankxu.debug
+  (CI makes a new debug key per run, so consecutive builds are not upgrade-compatible.)
+
+What happens when it opens:
+  1. First launch: the research disclosure. Dismiss it.
+  2. If Chrome is not installed: a notice saying arena.ai will open in a browser tab,
+     and a "Continue in browser" button.
+  3. All arena.ai pages load inside; terms, help and Google sign-in open elsewhere;
+     non-https schemes are refused with a toast.
+
+What is still unverified: real Trusted Web Activity mode (needs Chrome), the offline
+screen, Google and email-OTP sign-in.
