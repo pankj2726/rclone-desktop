@@ -1,8 +1,7 @@
 # Research — Phase 0 & Phase 1
 
-All fetches are single, read-only requests against public static files, per R4.
-Recorded 2026-11-08. No page was fetched twice, no content was scraped, no login or
-cookie was used.
+Single, read-only fetches of public files only (R4). No page fetched twice, no scraping,
+no login, no cookie or token use, no JS injection. Recorded **2026-11-08**.
 
 ---
 
@@ -12,42 +11,56 @@ cookie was used.
 |---|---|
 | OS | Debian GNU/Linux 13 (trixie), kernel 6.1.189+, x86_64 |
 | CPU | 2 cores |
-| RAM | 1.9 GiB total, 1.4 GiB available |
+| RAM | **1.9 GiB total, 1.4 GiB available** |
 | Disk | 20 GB free of 25 GB |
-| JDK | OpenJDK **11** (AGP 9.x requires 17+) |
+| JDK | OpenJDK **11** (AGP 9.x requires 17) |
 | Gradle / Android SDK / adb | not installed |
-| `/dev/kvm` | **ABSENT** — no VT-x/SVM exposure |
+| `/dev/kvm` | **ABSENT**; no `vmx`/`svm` in `/proc/cpuinfo` |
 
-### Reachability (P0-02)
+### Reachability — all hosts up
 
-| Host | HTTP | Verdict |
+| Host | HTTP |
+|---|---|
+| dl.google.com | 302 |
+| maven.google.com | 200 |
+| services.gradle.org | 200 |
+| plugins.gradle.org | 200 |
+| repo.maven.apache.org | 200 |
+| github.com | 200 |
+| api.adoptium.net | 200 |
+
+Artifact spot check: `dl.google.com/dl/android/maven2/com/android/tools/build/gradle/maven-metadata.xml`
+→ HTTP 200, 25 337 B, 22 ms. Real artifacts, not just DNS.
+
+**No blocked domains. The sandbox build path is viable on the network side.**
+
+### The two constraints that actually bite
+
+**1. No emulator, no device.** `/dev/kvm` is absent and the CPU exposes no virtualisation
+flag. A software-emulated AVD needs ~2 GB for the guest alone, against 1.4 GB available on
+2 cores. An Android emulator cannot run here at usable speed, if at all.
+
+> Consequence: **Gate G3 and the whole of Phase 4 cannot be satisfied by this agent.**
+> Definition of Done items 3 and 4 (installed and launched on a real device; Google login
+> and email OTP verified end to end) require the user's phone, a device farm, or a CI
+> emulator runner. R7 forbids claiming them otherwise.
+
+**2. RAM.** AGP + Gradle + Kotlin on 1.4 GiB available is marginal at best. R10's
+`-Xmx1536m` is itself larger than the free memory. A build may succeed for a project this
+small, or may OOM — that is an empirical question, to be tested, not assumed.
+
+---
+
+## Version pins (section 7 checklist)
+
+| Component | Pin | Source (2026-11-08) |
 |---|---|---|
-| dl.google.com | 302 | reachable |
-| maven.google.com | 200 | reachable |
-| services.gradle.org | 200 | reachable |
-| plugins.gradle.org | 200 | reachable |
-| repo.maven.apache.org | 200 | reachable |
-| github.com | 200 | reachable |
-| api.adoptium.net | 200 | reachable |
+| AGP | **9.5.1** (latest stable) | dl.google.com maven-metadata.xml |
+| AGP 9.5 minimums | Gradle **9.6.0**, JDK **17**, build-tools **36.0.0**, supports API 37 | developer.android.com/build/releases/agp-9-5-0-release-notes |
+| Play target API | **API 36+ mandatory** for new apps and updates since 2026-08-31 | support.google.com/googleplay/android-developer/answer/11926878 |
+| compileSdk / targetSdk | 36 (37 available; AGP 9.5 supports it) | as above |
 
-Spot check: `dl.google.com/dl/android/maven2/com/android/tools/build/gradle/maven-metadata.xml`
-returned HTTP 200, 25 337 bytes in 22 ms. Artifacts are genuinely downloadable, not just
-DNS-resolvable.
-
-Latest AGP versions visible in the metadata (2026-11-08): 9.3.3, 9.4.0, 9.4.1, 9.5.0, **9.5.1**.
-
-### Consequence
-
-**No blocked domains → the sandbox build path is viable on the network side.** The
-constraints are memory and virtualisation, not connectivity.
-
-### Emulator feasibility (affects Gate G3 and all of Phase 4)
-
-`/dev/kvm` is absent and the CPU exposes no `vmx`/`svm` flag. Software-emulated AVDs
-(API 26+) need roughly 2 GB of RAM for the guest alone, against 1.4 GB available, on
-2 cores. **An Android emulator cannot realistically run here.** Gate G3 and Phase 4
-cannot be satisfied inside this sandbox; they need a device farm, CI emulator runner, or
-the user's own device.
+minSdk stays **26** per the locked decisions.
 
 ---
 
@@ -58,102 +71,128 @@ the user's own device.
 | Item | Value |
 |---|---|
 | URL | `https://arena.ai/` |
-| Status | HTTP/2 **200** |
-| Size | 124 082 bytes |
+| Status | HTTP/2 **200**, 124 082 bytes |
 | Title | `Arena AI: The Official AI Ranking & LLM Leaderboard` |
-| `strict-transport-security` | `max-age=15552000; includeSubDomains; preload` |
-| `content-security-policy` | `frame-ancestors 'self' https://huggingface.co/ https://*.static.hf.space/` |
-| `x-frame-options` | `SAMEORIGIN` |
-| `referrer-policy` | `same-origin` |
-| `x-content-type-options` | `nosniff` |
-| `<meta name="theme-color">` | **absent** |
-| Icons | `/images/favicon-rebrand.svg`, `/apple-touch-icon.png` (180×180), `/apple-touch-icon-dark.png` |
-| `rel="manifest"` link | **absent** |
+| HSTS | `max-age=15552000; includeSubDomains; preload` |
+| CSP | `frame-ancestors 'self' https://huggingface.co/ https://*.static.hf.space/` |
+| X-Frame-Options | `SAMEORIGIN` |
+| Referrer-Policy | `same-origin` |
+| X-Content-Type-Options | `nosniff` |
+| theme-color | **absent** |
+| Icons | `/images/favicon-rebrand.svg`, `/apple-touch-icon.png` 180×180, `/apple-touch-icon-dark.png` |
+| `rel="manifest"` | **absent** |
 
-Note on framing headers: `X-Frame-Options: SAMEORIGIN` and `frame-ancestors` govern
-**iframe embedding**. A Trusted Web Activity is not an iframe — it renders in a full
-browser instance — so these headers do not block a TWA. They *would* block an
-iframe-based or naive WebView shell, which is one more reason the TWA decision is right.
+The framing headers matter for the legal question below, not for the TWA: a Trusted Web
+Activity is not an iframe, so `frame-ancestors` and `X-Frame-Options` do not apply to it.
+They *do* apply to iframe-based embedding — the technique Arena's Terms specifically ban.
 
-Because `theme-color` is absent, status/navigation bar colours for P3-04 must be taken
-from the site's own background colour or left to the platform default. To be decided at
-implementation time, recorded in DECISIONS.md.
+`theme-color` being absent means P3-04's status/navigation bar colours need a decision at
+implementation time (site background sample, or platform default). → DECISIONS.md.
 
-### P1-02 Web manifest
+### P1-02 Web manifest — **none**
 
-Requested `https://arena.ai/manifest.webmanifest` (the conventional path, since the home
-page declares no manifest link): HTTP **200** but `content-type: text/html` and a 114 486
-byte HTML shell — a soft-404, not a manifest.
+`/manifest.webmanifest` returns HTTP 200 but `content-type: text/html` and 114 486 bytes of
+the app shell: a **soft-404**, not a manifest. `/manifest.json` → 404. The home page declares
+no `rel="manifest"`.
 
-**Verdict: no web app manifest. Arena is not installable as a PWA.**
+**Verdict: Arena publishes no web app manifest and is not installable as a PWA.**
 
-**Gate G1 is satisfied in favour of building.** Chrome's *Install app* cannot produce an
-app-like install here, so the APK is not redundant with a zero-code option.
+> **Gate G1 resolved in favour of building.** The "Chrome Install app already does this with
+> zero code" escape hatch does **not** apply here — that path is unavailable. The APK is not
+> redundant.
 
-### P1-03 `/.well-known/assetlinks.json`
+### P1-03 `/.well-known/assetlinks.json` — empty
 
-HTTP 200, body is exactly `{}` (3 bytes). **No asset statements. No package is
-associated with arena.ai.**
+HTTP 200, body exactly `{}` (3 bytes). No asset statements, no package associations.
 
-Consequences, all expected:
-
-* A TWA launched against arena.ai will show a **URL bar** (unverified association). P4-01 records this as expected, not a failure.
-* `autoVerify` on the intent filter would do nothing yet (P3-07) — it must stay off until Arena publishes statements for our package + signing fingerprint.
-* Full-screen, bar-free operation requires Arena cooperation — the P2-05 / Phase 5 track.
+Consequences:
+* A TWA against arena.ai shows a **URL bar** (unverified association). P4-01 records that as
+  expected, not a defect.
+* `autoVerify` (P3-07) would achieve nothing yet and stays off until Arena publishes a
+  statement for our package name **and** our signing certificate fingerprint.
+* Full-screen, bar-free operation is blocked on Arena cooperation → the P2-05 / Phase 5 track.
 
 ### P1-04 Entry URLs
 
-The home page is a client-rendered Next.js app; it exposed only `/`, `/leaderboard` and
+The home page is a client-rendered Next.js app and exposed only `/`, `/leaderboard` and
 `/history/search` as literal hrefs. The authoritative public route list is `robots.txt`
-(a public static file, explicitly allowed by R4), which declares:
+(a public static file, explicitly permitted by R4), which declares:
 
 ```
-Allow: /            /chat        /side-by-side   /direct        /max
-       /text        /text/side-by-side   /text/direct
-       /image       /image/side-by-side  /image/direct
-       /search      /search/side-by-side /search/direct
-       /video       /code        /code/side-by-side   /code/direct
-       /agent       /how-it-works  /faq   /blog   /careers   /company/about
+/            /chat      /side-by-side   /direct    /max
+/text        /text/side-by-side         /text/direct
+/image       /image/side-by-side        /image/direct
+/search      /search/side-by-side       /search/direct
+/video       /code      /code/side-by-side  /code/direct
+/agent       /how-it-works   /faq   /blog   /careers   /company/about
 ```
 
-Plus, seen as hrefs on the home page: `/leaderboard`, `/history/search`.
-
-Mode → entry URL (for P3-08 shortcuts and P3-04 DEFAULT_URL):
+Plus `/leaderboard` and `/history/search` from home-page hrefs.
 
 | Mode | Entry URL | Source |
 |---|---|---|
-| Agent | `https://arena.ai/agent` | robots.txt Allow; user-supplied |
-| Chat (generic) | `https://arena.ai/chat` | robots.txt Allow |
-| Side-by-Side | `https://arena.ai/side-by-side` | robots.txt Allow |
-| Direct | `https://arena.ai/direct` | robots.txt Allow |
-| Battle | not present in robots.txt or home hrefs | **unresolved** — see below |
+| Agent | `https://arena.ai/agent` | robots.txt; also user-supplied |
+| Chat | `https://arena.ai/chat` | robots.txt |
+| Side-by-Side | `https://arena.ai/side-by-side` | robots.txt |
+| Direct | `https://arena.ai/direct` | robots.txt |
+| Max | `https://arena.ai/max` | robots.txt |
+| Text / Image / Search / Video / Code | `https://arena.ai/{text,image,search,video,code}` | robots.txt |
 | Leaderboard | `https://arena.ai/leaderboard` | home page href |
-| Max | `https://arena.ai/max` | robots.txt Allow |
+| **Battle** | **not found** | see below |
 
-**Open item / R5 compliance.** *Battle* appears in the roadmap and is mentioned in the
-page markup, but no `/battle` route is declared in robots.txt and no href to it exists on
-the saved home page. Per R5 I will not invent `arena.ai/battle`. Either the mode lives at
-a different path, is unsupported as a standalone route, exposes an anchor to it, or it is a
-different label for side-by-side. Escalated to the user (see PROGRESS.md).
+**Open item, R5 compliance.** "Battle" appears in the roadmap and is mentioned in the page
+markup, but there is **no `/battle` route in robots.txt and no href to one on the home
+page**. R5 forbids inventing `arena.ai/battle`. Either it lives at a different path, is a
+mode inside another route, or is a label rather than a URL. **Escalated to the user.** Until
+resolved, no Battle shortcut and no Battle shortcut URL will be shipped.
 
-### P1-05 Terms / privacy — status
+### P1-05 Terms and privacy — key clauses
 
-Not yet analysed. Two redirects to the help centre need following (single fetch each) when
-this phase item is worked. Not a blocker for the sandbox work; it is a blocker for
-distribution decisions, and it feeds the Phase 5 permission request.
+Terms of Use (help.arena.ai, fetched 2026-11-08). Relevant prohibitions:
 
-### P1-06 Arena API docs — status
+* **(iii)** framing or using framing techniques to enclose any trademark, logo or other
+  portion of the Service, including images, text, page layout or form.
+* **(vi)** accessing the Services through programmatic or automated means, or automatically
+  querying them.
+* **(vii)** using spiders, robots, scrapers, crawlers or similar to scrape, extract or
+  download data.
+* **Trademarks:** "Arena, Arena Intelligence, and all related stylizations, graphics, logos,
+  service marks and trade names … are the trademarks of Company and may not be used without
+  permission in connection with your, or any third-party's, products or service[s]."
 
-Not yet reviewed. Only needed for optional module M1, which is off by default.
+How the chosen architecture sits against these:
+
+* A **TWA / Custom Tab is not framing.** It hands the URL to the real browser engine and
+  renders the real site in a top-level browsing context. No iframe, no re-hosting, no
+  reproduction of layout. Clause (iii) is aimed at embedding, and the site enforces that with
+  `X-Frame-Options: SAMEORIGIN` + `frame-ancestors`. The TWA does not trip either.
+* Clauses (vi) and (vii) target automated access. A person using an app that opens a browser
+  is not automated access. This project does no scraping, no token extraction, no injection
+  — consistent with R4.
+* **The trademark clause is why R6 exists.** Shipping something called "Arena" with Arena's
+  logo is the one clearly prohibited thing here. Neutral name, original icon, no Arena marks
+  in app name, icon, or store listing.
+
+*This is a reading of public documents, not legal advice.*
+
+Privacy policy was retrievable but is not yet analysed; scheduled with the Phase 5 track.
+
+### P1-06 Arena API docs
+
+Not yet reviewed. Only needed for optional module M1 (off by default). Deferred; not on the
+critical path to a signed APK.
 
 ---
 
-## What this means for the build
+## What Phase 0/1 changes about the plan
 
-1. Network is fine; the sandbox can build.
-2. **No emulator, no device.** Every item in Phase 4 and Gate G3 must be marked
-   *Unverified — no Android runtime available* unless the user supplies results or CI
-   supplies a runner. R7 forbids claiming otherwise.
-3. Missing assetlinks means a URL bar in the TWA until Arena cooperates. This is a
-   known, documented limitation, not a defect in the build.
-4. `theme-color` absent → status-bar colour needs a decision at P3-04.
+1. **Build in sandbox: plausible but unproven.** Network is clean; RAM is the risk. Test
+   before committing to it.
+2. **Verification is the real blocker, not building.** No emulator, no device. Everything in
+   Phase 4 and Gate G3 will be *Unverified* unless the user runs the QA checklist or a device
+   farm does.
+3. **URL bar in the app until Arena publishes assetlinks.json.** Documented limitation, not a
+   bug.
+4. **Battle mode URL unresolved.** Needs the user.
+5. **Signing needs the user's key**, which R3 says never to handle — so either the user signs
+   locally or supplies the keystore by environment variable. Decision needed.
