@@ -2,6 +2,55 @@
 
 Updated at the end of every phase (R2). Newest at the top.
 
+## 2026-11-08 — roadmap v4, stage 0 and part of stage 2
+
+* **S0-09:** no official Arena/LLaMArena Android app exists (D-27). No stop condition.
+* **S0-03:** committed `ci/debug.keystore` so CI builds share one signature; two consecutive
+  installs now upgrade in place instead of forcing an uninstall (D-28). Release key still
+  environment-only.
+* **S0-08:** allow-list hardened — 18 unit cases; non-443 ports are EXTERNAL; non-ASCII hosts
+  BLOCK because `java.net.URI` yields a null host there (D-29).
+* **S0-07:** shortcut-target tests for both build types, and a theme/colour pairing test that
+  fails if the white-on-white bug of D-24 returns. Verified by reintroducing the bug and
+  watching the test fail.
+* **S0-04, S0-05:** matrix re-baselined from device evidence; all captures cropped to remove
+  the status and navigation bars (R13); `superseded/WHY.md` explains the discarded ones.
+* **S2-04:** About and licences screens, with a user-initiated redacted diagnostics export.
+  Seen on the device.
+* **S2-05:** 1.5x font and dark mode pass on the device; TalkBack and RTL recorded Unverified
+  with reasons.
+* Repo hygiene: `cache/` was committed by accident (build-artifact zips, about 10 MB of pack);
+  untracked and ignored now.
+
+Full state per task: `docs/ROADMAP-V4-STATUS.md`.
+
+## 2026-11-08 — first device run (Samsung SM-G9900, Android 12)
+
+Installed CI artifacts on a real handset over adb and worked through the QA report. The app
+had never run anywhere before this.
+
+**Three defects found and fixed, each now guarded by CI:**
+
+1. **It crashed on launch.** `androidbrowserhelper` 2.7.4 requires the app to declare
+   `ManageDataLauncherActivity` and does not declare it itself; `LauncherActivity.launchTwa()`
+   throws `IllegalArgumentException` without it. Declared, and `scripts/check-manifest.py`
+   added to the build. **Every release so far had this bug.**
+2. **The gate was invisible in light mode.** `Theme.Material` (dark) paired with a white
+   background: white text on white. Light parent in `values/`, dark kept in `values-night/`.
+3. **Shortcuts could not start.** `targetPackage` was hard-coded to the release id, so the
+   debug build failed with `ActivityNotFoundException`; omitting it produced a chooser instead.
+   Now per build type, verified inside the packaged APK by `scripts/check-shortcuts.py`.
+
+**Added:** the gate names the Custom Tab fallback when no TWA provider is installed (D-25),
+instead of silently degrading.
+
+**Verified on the device:** install, first-run disclosure, in-app routing of arena.ai,
+external routing, seven blocked schemes, all four shortcuts, PAR-02/04/06/09/11.
+**Still unverified:** real TWA (no Chrome on the device, and Play cannot install it with zero
+Google accounts), offline pre-check (the simulator kept its network up), sign-in, prompts.
+
+Evidence: `docs/qa-evidence/device-2026-11-08/` (README, screenshots, crash trace, matrices).
+
 ## 2026-11-08 — v3.1 build published, SBOM and verification metadata closed
 
 * **New APK built from the v3.1 sources.** CI run 42499683401 (commit cb4c36a) then

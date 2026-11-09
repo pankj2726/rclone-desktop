@@ -86,3 +86,129 @@ build passes. Runtime-only contracts now have a build-time test.
 **Honest note.** This bug existed in every release so far, including `v1.0.0-debug` and
 `v1.0.0-unsigned`. None of them would have launched. The docs claiming "built, not yet
 verified" were accurate, and this is what verification buys.
+
+## D-24 — Light and dark themes must pair with light and dark bar colours
+
+`Theme.Pankxu` inherited `@android:style/Theme.Material.NoActionBar`, which is the **dark**
+platform theme, while `@color/bar` is `#FFFFFFFF` in light mode. The result on a device was a
+white-on-white gate: the title, the status text and the unofficial-client notice were all
+present in the view tree and invisible on screen. The parent is now `Theme.Material.Light`
+in `values/` and stays `Theme.Material` in `values-night/`, matching the colour split that
+already existed. Lesson recorded because the failure is silent to lint: the layout is valid,
+the strings resolve, and only a screenshot catches it.
+
+## D-25 — Say when the TWA is not a TWA
+
+Without a browser declaring `androidx.browser.trusted.category.TrustedWebActivities`, the
+library degrades to a Custom Tab in whatever browser is installed. That is a reasonable
+fallback, but it is not the product described in the README, and the user had no way to know
+why arena.ai opened in a tab with a URL bar. `TwaProviderCheck` asks the PackageManager; if no
+provider is present the gate explains the difference and offers "Continue in browser". The
+check runs on every launch, so installing Chrome later takes effect without clearing data.
+Declared in `docs/LIMITATIONS.md` rather than hidden.
+
+## D-26 — Shortcut targets are per build type, and checked against the packaged APK
+
+`android:targetPackage` must name the applicationId of the build that ships the file. Two
+failures were observed on the device, in this order:
+
+1. hard-coded to the release id -> `ActivityNotFoundException: Shortcut could not be started`
+   on the debug build;
+2. omitted -> the launcher drops the component, the intent becomes implicit and a chooser
+   opens instead of the app.
+
+So `src/main` carries `what.thefcuk.pankxu`, `src/debug` overrides the same file with
+`what.thefcuk.pankxu.debug`, and `scripts/check-shortcuts.py` asserts the value inside the
+built APK equals the APK's own package name. A resource-file rule that neither unit tests nor
+lint can see is now a build failure.
+
+## D-27 — No official Arena Android app exists (S0-09, checked 2026-11-08)
+
+Checked Play Store listings and Arena's public help pages on 2026-11-08. There is no
+first-party Arena / LMArena Android application. The Play listings that match the word
+"Arena" are unrelated products (an NHL venue app and an image-generator by a different
+developer), and the public help pages still describe browser access only. **No stop
+condition triggered**; the launcher remains a legitimate personal-use wrapper.
+
+Re-check at the 30-day and 90-day reviews in section 8 of the roadmap, and re-run this task
+immediately if Arena announces one.
+
+## D-28 — One committed debug keystore, because CI was minting a new key per run
+
+Consecutive CI builds could not upgrade each other: each ephemeral runner generated its own
+debug key, so `adb install -r` failed with `INSTALL_FAILED_UPDATE_INCOMPATIBLE` and every
+device test began with an uninstall that wiped app data - which also reset the first-run
+disclosure, making the first-run path untestable in isolation.
+
+`ci/debug.keystore` is now committed and wired into the `debug` build type. This is a
+deliberate, documented exception:
+
+* debug keys are not secrets - the password is the Android convention (`android`), and the
+  certificate is valid only for builds marked debuggable, which are never shipped;
+* the **release** key remains environment-variable-only and is never in the repository;
+* `.gitleaks.toml` allowlists exactly the keystore path and the two convention passwords, so a
+  real secret anywhere else still fails the secret scan.
+
+Fingerprint of the shared debug certificate (SHA-256):
+`8B:C6:CD:ED:D8:D0:5C:C5:D7:49:A6:71:C7:D7:18:F3:6A:8A:44:51:31:F6:6A:93:F7:E0:DD:35:91:20:D4:E4`
+
+This is not the release fingerprint and must never be published as one.
+
+## D-29 — S0-08 allow-list hardening: what changed and what the parser split means
+
+Added to `UrlPolicy` and its tests (18 cases, all passing on a JVM):
+
+* **Any port other than 443 is EXTERNAL.** `https://arena.ai:8443/` is not the published
+  entry point, and allowing the app to frame arbitrary services on a trusted host is an
+  allowance that ages badly.
+* Uppercase scheme and host, a single trailing root dot, and the explicit default port stay
+  IN_APP (already covered, now pinned by tests).
+* Backslash tricks, userinfo in any position, look-alikes (`arena.ai.evil.example`,
+  `evilarena.ai`, `arena-ais.example` style), percent-encoded dots, double trailing dots and a
+  leading dot are all kept out of IN_APP.
+* **Non-ASCII hosts are BLOCKed, not EXTERNAL.** `java.net.URI` returns `null` from
+  `getHost()` for a non-ASCII authority, so the policy cannot name the host and refuses.
+  Android's `Uri.parse()` is lenient and does not agree - which is why the same inputs are
+  also exercised on the device in the S0-08 device run, rather than trusting the unit test to
+  describe runtime behaviour. The two results are recorded together; if they ever diverge,
+  the device wins and the policy gets an explicit punycode/IDN check.
+
+## D-30 — The TWA-capability check asked about the wrong component type
+
+`TwaProviderCheck` originally queried *services* for
+`androidx.browser.trusted.category.TrustedWebActivities`. Installing Chrome 156 on the test
+device and reading its manifest showed the category on
+`org.chromium.chrome.browser.browserservices.ManageTrustedWebActivityDataActivity`, an
+**activity**. The service query therefore always came back empty, and the gate told the user
+"Chrome is not installed" on a device where Chrome was installed and signed in. It now queries
+activities.
+
+Two things worth keeping:
+
+1. **A capability check is not a promise.** Even with Chrome present, arena.ai publishes no
+   `assetlinks.json` for this package, so the browser shows its toolbar anyway - what the
+   device produced was a Custom Tab inside `com.android.chrome`, not a Trusted Web Activity.
+   The notice now says what is actually true ("Arena has not published a link-verification
+   file, so the toolbar stays visible") instead of blaming the device.
+2. **The earlier pass could not have caught this.** With no TWA-capable browser installed, a
+   permanently-empty query and a correct answer look identical. Only installing Chrome
+   separated them. The same trap applies to any check that is trivially true in the test
+   environment.
+
+## D-31 — No TWA-capability probe; state the limitation instead
+
+A second attempt at detecting whether the device can host a Trusted Web Activity - this time
+querying *activities* for `androidx.browser.trusted.category.TrustedWebActivities` - also
+returned nothing on a device with Chrome 156 installed. The cause is Android 11+ package
+visibility: an app cannot enumerate another package's components unless its manifest declares
+a matching `<queries>` entry, and matching Chrome's internal intent filter would mean guessing
+at Chromium's action name. Guessing wrong produces a confident, false message, which is worse
+than no message.
+
+So the probe is gone. The gate states the one thing that is true on every device today: Arena
+has not verified this app, so the browser toolbar stays visible. When Arena publishes
+`assetlinks.json` and `autoVerify` can be switched on (S3-02), this notice becomes false and
+must be removed at the same time - noted here so the two changes stay together.
+
+Diagnostics no longer reports a browser capability either, for the same reason: it would have
+said "none" on a device with Chrome.

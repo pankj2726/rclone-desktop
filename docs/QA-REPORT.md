@@ -131,3 +131,57 @@ and `scripts/make-sbom.py` writes CycloneDX 1.5 (`sbom.cdx.json`, 48 components 
 The `build` workflow generates it on every push and uploads it with the artifact. Components
 appear because Gradle resolved them and for no other reason; licence fields are intentionally
 blank (see `THIRD-PARTY-NOTICES.md` for the reviewed list, D-22).
+
+## Device pass — 2026-11-08
+
+First execution on real hardware: Samsung SM-G9900 (Galaxy S21 FE), Android 12 / SDK 32. Full
+method and index in `docs/qa-evidence/device-2026-11-08/README.md`.
+
+### Three defects that only a device could find
+
+| # | Defect | How it showed up | Fix |
+|---|---|---|---|
+| 1 | `ManageDataLauncherActivity` not declared (androidbrowserhelper 2.7.4 requires the app to declare it, and does not declare it itself) | Every launch that reached the TWA crashed: `IllegalArgumentException ... does not exist in what.thefcuk.pankxu.debug` | Declared it `exported=false`; added `scripts/check-manifest.py` to CI (D-23) |
+| 2 | Gate text was white on a white background in light mode | Screenshot showed an empty screen while `uiautomator dump` listed the text; `Theme.Material` is the *dark* parent paired with a white background | Light parent in `values/`, dark kept in `values-night/` (D-24) |
+| 3 | Shortcuts hard-coded `targetPackage="what.thefcuk.pankxu"` | Debug build: `ActivityNotFoundException: Shortcut could not be started`; the fix's first attempt (omitting the package) produced a chooser instead | Per-build-type override + `scripts/check-shortcuts.py` on the packaged APK (D-26) |
+
+Defect 1 shipped in `v1.0.0-debug` and `v1.0.0-unsigned`. Every previous "not yet verified"
+statement was accurate; this is what verification buys.
+
+### What now passes on the device
+
+| Item | Result | Evidence |
+|---|---|---|
+| Install and first launch | Pass | `adb install` of a CI artifact, 701 ms cold start, no crash |
+| Research disclosure (X-03) | Pass | shown once, dismissable, contains the Arena FAQ wording |
+| Unofficial-client notice (X-02) | Pass | footer of the gate |
+| In-app routing of `arena.ai` | Pass | web content served by `mark.via` Custom Tab |
+| External routing (PAR-11) | Pass | `help.arena.ai`, `accounts.google.com`, lookalikes leave the app |
+| Blocked schemes (N-01..N-07) | Pass | `intent:`, `file:`, `tel:`, `mailto:`, `data:`, userinfo-bearing, cleartext |
+| Shortcuts | Pass | all four registered with the correct component |
+| No-TWA fallback notice (D-25) | Pass | names the fallback and continues deliberately |
+
+### What is still unverified
+
+* Real TWA behaviour — the device has no Chrome and cannot install it (0 Google accounts).
+* Offline pre-check — the simulator would not drop its network.
+* Google and email-OTP sign-in (PAR-07) — no account on the device.
+* Sending an actual prompt (PAR-01, PAR-03, PAR-08) — deliberately not done.
+* Link verification — `pm get-app-links` reports `arena.ai` **Disabled**, as expected without an
+  `assetlinks.json` statement; `autoVerify` stays off.
+
+## S2-05 accessibility and locale pass — 2026-11-08, device D1
+
+Run on build `pankxu-1.0.0-debug-v40.apk`
+(`e25d7da45c614f8e26b71bcef85ea7daf1528d9b58d602e18f471315d79d0ee5`).
+
+| Check | Result | Evidence |
+|---|---|---|
+| Largest system font (1.5x) | **Pass** — all five gate elements still laid out, nothing clipped, buttons still tappable | `28-large-font-1.5x.png` |
+| Dark mode (`cmd uimode night yes`) | **Pass** — black background, light text, both buttons legible | `29-dark-mode.png` |
+| Light mode | **Pass** — this is the D-24 fix, regression-checked here | `25-gate-with-about.png` |
+| Non-English locale (device is zh-HK) | **Pass for layout, app strings remain English** — no truncation or overlap observed; the app deliberately ships English-only for v1.0.0 | all captures |
+| TalkBack | **Unverified** — not exercised; would need enabling the screen reader and walking the gate | — |
+| RTL (ar-EG) | **Unverified** — Android 12 has no `wm set-locale`, and `debug.force_rtl` cannot be set on a production build, so this device cannot force an RTL layout. `supportsRtl="true"` is declared and the layouts use start/end-safe attributes, but that is design evidence, not a test | — |
+
+Both failures in this area would be release blockers if they had occurred; neither did.

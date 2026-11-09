@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  P3-08. Four shortcuts, every URL taken from arena.ai/robots.txt (P1-04) —
+  no invented routes. "Battle" is deliberately absent: no /battle route exists
+  in robots.txt and no href to one appears on the home page (see DECISIONS.md D-02).
+
+  android:targetPackage MUST be set, and it must be the applicationId of the build
+  that ships this file. History, both observed on a device:
+
+  * Hard-coded to the release id while the debug build uses what.thefcuk.pankxu.debug
+    -> "ActivityNotFoundException: Shortcut could not be started" (evidence:
+    docs/qa-evidence/device-2026-11-08/15-shortcut-tap-result.png).
+  * Omitted entirely -> the launcher drops the component, the intent becomes implicit,
+    and the user gets a browser/chooser sheet instead of the app.
+
+  This is the debug override: it carries the .debug applicationId and must stay in
+  step with src/main/res/xml/shortcuts.xml in every other respect. scripts/check-shortcuts.py asserts the packaged value matches the
+  package name of the built APK.
+-->
+<shortcuts xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <shortcut
+        android:shortcutId="agent"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/shortcut_agent_short"
+        android:shortcutLongLabel="@string/shortcut_agent_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu.debug"
+            android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
+            android:data="https://arena.ai/agent" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="chat"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/shortcut_chat_short"
+        android:shortcutLongLabel="@string/shortcut_chat_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu.debug"
+            android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
+            android:data="https://arena.ai/chat" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="side_by_side"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/shortcut_sidebyside_short"
+        android:shortcutLongLabel="@string/shortcut_sidebyside_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu.debug"
+            android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
+            android:data="https://arena.ai/side-by-side" />
+    </shortcut>
+
+    <shortcut
+        android:shortcutId="leaderboard"
+        android:enabled="true"
+        android:shortcutShortLabel="@string/shortcut_leaderboard_short"
+        android:shortcutLongLabel="@string/shortcut_leaderboard_long">
+        <intent
+            android:action="android.intent.action.VIEW"
+            android:targetPackage="what.thefcuk.pankxu.debug"
+            android:targetClass="what.thefcuk.pankxu.LaunchGateActivity"
+            android:data="https://arena.ai/leaderboard" />
+    </shortcut>
+
+</shortcuts>

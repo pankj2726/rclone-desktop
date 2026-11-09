@@ -1,50 +1,30 @@
 plugins {
     alias(libs.plugins.android.application)
+    // AGP 9.0+ has built-in Kotlin support; org.jetbrains.kotlin.android must NOT be applied.
+    alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 android {
-    namespace = "what.thefcuk.pankxu"
+    namespace = "com.pankxu.arenacompanion"
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "what.thefcuk.pankxu"
+        applicationId = "com.pankxu.arenacompanion"   // R3: our own id, never arena's
         minSdk = 26
         targetSdk = 36
-        versionCode = 10000          // P2-01: major*10000 + minor*100 + patch -> 1.0.0
+        versionCode = 1
         versionName = "1.0.0"
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
-    // P8-01 / R3: the keystore never lives in the repo and is never read from
-    // a committed file. Paths and passwords arrive only as environment variables.
-    signingConfigs {
-        create("release") {
-            val ksPath = System.getenv("PANKXU_KEYSTORE_PATH")
-            if (!ksPath.isNullOrBlank()) {
-                storeFile = file(ksPath)
-                storePassword = System.getenv("PANKXU_KEYSTORE_PASSWORD")
-                keyAlias = System.getenv("PANKXU_KEY_ALIAS")
-                keyPassword = System.getenv("PANKXU_KEY_PASSWORD")
-            }
-        }
-    }
+    buildFeatures { compose = true }
 
     buildTypes {
-        debug {
-            isDebuggable = true
-            applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
-        }
         release {
             isMinifyEnabled = true
             isShrinkResources = true
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro",
-            )
-            // Unsigned when no keystore is supplied, so CI can still build and test.
-            if (!System.getenv("PANKXU_KEYSTORE_PATH").isNullOrBlank()) {
-                signingConfig = signingConfigs.getByName("release")
-            }
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
 
@@ -52,23 +32,35 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+    testOptions { unitTests { isIncludeAndroidResources = true; isReturnDefaultValues = true } }
+}
 
-    lint {
-        abortOnError = false     // reported, not fatal, until first clean CI run
-        warningsAsErrors = false
+kotlin {
+    compilerOptions {
+        jvmTarget = org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
     }
 }
 
-// Compile as UTF-8 regardless of the host locale. Caught for real: em dashes in
-// comments failed to compile under a C-locale javac default (DECISIONS D-09).
-// Must sit outside the android { } block: `tasks` is a project property.
-tasks.withType<JavaCompile>().configureEach {
-    options.encoding = "UTF-8"
-}
-
 dependencies {
-    implementation(libs.androidx.browser)
-    implementation(libs.androidbrowserhelper)
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.material3)
+    implementation("androidx.compose.material:material-icons-core")
+    implementation(libs.compose.tooling.preview)
+    debugImplementation(libs.compose.ui.tooling)
+    implementation(libs.activity.compose)
+    implementation(libs.lifecycle.viewmodel.compose)
+    implementation(libs.lifecycle.runtime.compose)
+    implementation(libs.navigation.compose)
+    implementation(libs.core.ktx)
+    implementation(libs.datastore.preferences)
+    implementation(libs.browser)          // Custom Tabs
+    implementation(libs.security.crypto) // EncryptedSharedPreferences (AES-256)
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
+    implementation(libs.okhttp)
+    implementation(libs.work.runtime.ktx)
 
     testImplementation(libs.junit)
 }

@@ -11,6 +11,7 @@ import android.net.Network;
 import android.net.NetworkCapabilities;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -38,7 +39,11 @@ public class LaunchGateActivity extends Activity {
     private static final String KEY_DISCLOSURE_SHOWN = "disclosure_shown_v1";
     private static final String ARENA_PRIVACY_URL = "https://arena.ai/privacy";
 
+    private static final String TAG = "PankxuGate";
+
     private boolean waitingForNetwork;
+    /** Set when the user accepts the Custom Tab fallback, so the notice is not a loop. */
+    private boolean proceedingWithoutTwa;
     private TextView status;
 
     @Override
@@ -95,6 +100,14 @@ public class LaunchGateActivity extends Activity {
             return;
         }
 
+        // A TWA needs a browser that declares the TrustedWebActivities category. Without
+        // one the library degrades to a Custom Tab, which is a browser tab with a URL bar
+        // rather than the app-like experience. Say so once instead of degrading silently.
+        if (!proceedingWithoutTwa && !TwaProviderCheck.isProviderInstalled(this)) {
+            showFallbackNotice();
+            return;
+        }
+
         // IN_APP: hand to the Trusted Web Activity launcher, which re-validates.
         Intent launch = new Intent(this, PankxuLauncherActivity.class);
         launch.putExtra(Intent.EXTRA_TEXT, requested);
@@ -110,6 +123,28 @@ public class LaunchGateActivity extends Activity {
             return intent.getData().toString();
         }
         return getString(R.string.default_url);
+    }
+
+    /**
+     * No TWA host installed. Explain the difference and let the user continue in a
+     * browser tab deliberately. Re-checked on every launch, so installing Chrome later
+     * takes effect without clearing app data.
+     */
+    private void showFallbackNotice() {
+        Log.i(TAG, "no Trusted Web Activity provider installed; TWA will fall back to a Custom Tab");
+        status.setText(R.string.gate_no_twa_notice);
+        status.setVisibility(View.VISIBLE);
+        Button retry = findViewById(R.id.gate_retry);
+        retry.setText(R.string.gate_continue);
+        retry.setOnClickListener(v -> {
+            proceedingWithoutTwa = true;
+            retry.setVisibility(View.GONE);
+            status.setVisibility(View.GONE);
+            retry.setText(R.string.gate_retry);
+            retry.setOnClickListener(w -> proceed());
+            proceed();
+        });
+        retry.setVisibility(View.VISIBLE);
     }
 
     private void showOffline() {

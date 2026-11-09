@@ -12,6 +12,7 @@ runtime. This check turns that class of bug into a build failure.
 Input is `aapt2 dump xmltree --file AndroidManifest.xml <apk>`, the format the
 build workflow already produces.
 """
+import pathlib
 import re
 import sys
 
@@ -21,6 +22,9 @@ REQUIRED_ACTIVITIES = {
     "what.thefcuk.pankxu.PankxuLauncherActivity": False,
     "com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity": False,
     "com.google.androidbrowserhelper.trusted.ShortcutTrampolineActivity": True,
+    # S2-04 screens: in-app only, nothing outside may open them.
+    "what.thefcuk.pankxu.AboutActivity": False,
+    "what.thefcuk.pankxu.LicensesActivity": False,
 }
 
 FORBIDDEN_PERMISSIONS = {"android.permission.INTERNET"}
@@ -78,6 +82,9 @@ def main(path):
         failures.append(f"missing permission: {perm}")
     for perm in sorted(FORBIDDEN_PERMISSIONS & perms):
         failures.append(f"unexpected permission: {perm} (the app must not hold INTERNET)")
+
+    # Shortcut targets are checked against the built APK by scripts/check-shortcuts.py,
+    # which is the only place the packaged package name is authoritative.
 
     print(f"activities declared: {len(names)}")
     for name in sorted(names):
