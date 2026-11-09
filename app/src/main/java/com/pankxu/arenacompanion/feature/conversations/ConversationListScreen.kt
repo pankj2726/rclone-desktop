@@ -14,6 +14,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,12 +23,8 @@ import com.pankxu.arenacompanion.core.storage.StorageManager
 import com.pankxu.arenacompanion.data.entities.ConversationEntity
 import com.pankxu.arenacompanion.domain.ConversationManager
 import com.pankxu.arenacompanion.ui.empty.EmptyState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.Chat
 import kotlinx.coroutines.launch
-import androidx.compose.runtime.rememberCoroutineScope
 
-/** Conversation list screen. */
 @Composable
 fun ConversationListScreen(
     conversationManager: ConversationManager,
@@ -44,7 +41,6 @@ fun ConversationListScreen(
 
         if (conversations.isEmpty()) {
             EmptyState(
-                icon = Icons.Outlined.Article,
                 title = "No conversations",
                 message = "Start a new conversation to see it here.",
             )

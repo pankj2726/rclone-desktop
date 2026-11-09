@@ -12,22 +12,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 
-/** Generic empty state. */
 @Composable
 fun EmptyState(
-    icon: ImageVector,
     title: String,
     message: String,
     modifier: Modifier = Modifier,
+    icon: ImageVector? = null,
 ) {
     Column(
         modifier.padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
-        Icon(icon, contentDescription = null,
-            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(bottom = 16.dp))
+        if (icon != null) {
+            Icon(icon, contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 16.dp))
+        }
         Text(title, style = MaterialTheme.typography.titleMedium)
         Text(message, style = MaterialTheme.typography.bodyMedium,
             color = MaterialTheme.colorScheme.onSurfaceVariant,
