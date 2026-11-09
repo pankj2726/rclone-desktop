@@ -28,7 +28,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -37,6 +36,8 @@ import com.pankxu.arenacompanion.feature.CompareTrayScreen
 import com.pankxu.arenacompanion.feature.CredentialVaultScreen
 import com.pankxu.arenacompanion.feature.SessionManagerScreen
 import com.pankxu.arenacompanion.feature.StorageDashboardScreen
+import com.pankxu.arenacompanion.feature.conversations.ConversationListScreen
+import com.pankxu.arenacompanion.feature.models.ModelDiscoveryScreen
 import com.pankxu.arenacompanion.feature.settings.SettingsScreen
 import com.pankxu.arenacompanion.ui.theme.ArenaCompanionTheme
 import com.pankxu.arenacompanion.web.BrowserLauncher
@@ -45,7 +46,9 @@ import com.pankxu.arenacompanion.web.PageState
 import com.pankxu.arenacompanion.web.WebViewHost
 import kotlinx.coroutines.launch
 
-enum class Screen { BROWSER, TRAY, VAULT, STORAGE, SESSIONS, SETTINGS }
+enum class Screen {
+    BROWSER, TRAY, VAULT, STORAGE, SESSIONS, SETTINGS, CONVERSATIONS, MODELS
+}
 
 class MainActivity : ComponentActivity() {
 
@@ -80,10 +83,9 @@ class MainActivity : ComponentActivity() {
                 val links by store.links.collectAsStateWithLifecycle(initialValue = emptyList())
                 val scope = rememberCoroutineScope()
 
-                // Handle deep links
                 if (intent?.data != null) {
-                    val deepLinkHandler = com.pankxu.arenacompanion.navigation.DeepLinkHandler(activity)
-                    val validUri = deepLinkHandler.handleIntent(intent)
+                    val handler = com.pankxu.arenacompanion.navigation.DeepLinkHandler(activity)
+                    val validUri = handler.handleIntent(intent)
                     if (validUri != null) {
                         webView?.post { webView?.loadUrl(validUri.toString()) }
                     }
@@ -97,42 +99,14 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     bottomBar = {
                         NavigationBar {
-                            NavigationBarItem(
-                                selected = screen == Screen.BROWSER,
-                                onClick = { screen = Screen.BROWSER },
-                                icon = { Text("Web") },
-                                label = { Text("Browser") },
-                            )
-                            NavigationBarItem(
-                                selected = screen == Screen.TRAY,
-                                onClick = { screen = Screen.TRAY },
-                                icon = { Text("Tray") },
-                                label = { Text("Tray") },
-                            )
-                            NavigationBarItem(
-                                selected = screen == Screen.VAULT,
-                                onClick = { screen = Screen.VAULT },
-                                icon = { Text("Key") },
-                                label = { Text("Vault") },
-                            )
-                            NavigationBarItem(
-                                selected = screen == Screen.STORAGE,
-                                onClick = { screen = Screen.STORAGE },
-                                icon = { Text("Disk") },
-                                label = { Text("Storage") },
-                            )
-                            NavigationBarItem(
-                                selected = screen == Screen.SESSIONS,
-                                onClick = { screen = Screen.SESSIONS },
-                                icon = { Text("List") },
-                                label = { Text("Sessions") },
-                            )
-                            NavigationBarItem(
-                                selected = screen == Screen.SETTINGS,
-                                onClick = { screen = Screen.SETTINGS },
-                                icon = { Text("Set") },
-                                label = { Text("Settings") },
-                            )
+                            NavigationBarItem(selected = screen == Screen.BROWSER, onClick = { screen = Screen.BROWSER }, icon = { Text("Web") }, label = { Text("Browser") })
+                            NavigationBarItem(selected = screen == Screen.TRAY, onClick = { screen = Screen.TRAY }, icon = { Text("Tray") }, label = { Text("Tray") })
+                            NavigationBarItem(selected = screen == Screen.CONVERSATIONS, onClick = { screen = Screen.CONVERSATIONS }, icon = { Text("Chat") }, label = { Text("Chat") })
+                            NavigationBarItem(selected = screen == Screen.MODELS, onClick = { screen = Screen.MODELS }, icon = { Text("Model") }, label = { Text("Models") })
+                            NavigationBarItem(selected = screen == Screen.VAULT, onClick = { screen = Screen.VAULT }, icon = { Text("Key") }, label = { Text("Vault") })
+                            NavigationBarItem(selected = screen == Screen.STORAGE, onClick = { screen = Screen.STORAGE }, icon = { Text("Disk") }, label = { Text("Storage") })
+                            NavigationBarItem(selected = screen == Screen.SESSIONS, onClick = { screen = Screen.SESSIONS }, icon = { Text("List") }, label = { Text("Sessions") })
+                            NavigationBarItem(selected = screen == Screen.SETTINGS, onClick = { screen = Screen.SETTINGS }, icon = { Text("Set") }, label = { Text("Settings") })
                         }
                     }
                 ) { insets ->
@@ -156,6 +130,14 @@ class MainActivity : ComponentActivity() {
                                 container = container,
                                 onNavigateToVault = { screen = Screen.VAULT },
                             )
+                            Screen.CONVERSATIONS -> ConversationListScreen(
+                                conversationManager = container.conversationManager,
+                                storage = storage,
+                                onOpenConversation = { /* TODO: navigate to conversation detail */ },
+                            )
+                            Screen.MODELS -> ModelDiscoveryScreen(
+                                modelManager = container.modelDiscoveryManager,
+                            )
                         }
                     }
                 }
@@ -166,8 +148,8 @@ class MainActivity : ComponentActivity() {
     override fun onNewIntent(intent: Intent) {
         super.onNewIntent(intent)
         setIntent(intent)
-        val deepLinkHandler = com.pankxu.arenacompanion.navigation.DeepLinkHandler(this)
-        val validUri = deepLinkHandler.handleIntent(intent)
+        val handler = com.pankxu.arenacompanion.navigation.DeepLinkHandler(this)
+        val validUri = handler.handleIntent(intent)
         if (validUri != null) {
             webView?.post { webView?.loadUrl(validUri.toString()) }
         }

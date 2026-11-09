@@ -60,6 +60,7 @@ dependencies {
     ksp(libs.room.compiler)
     implementation(libs.okhttp)
     implementation(libs.work.runtime.ktx)
+    implementation(libs.material.icons)
 
     testImplementation(libs.junit)
 }
