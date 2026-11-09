@@ -18,17 +18,20 @@ import sys
 
 REQUIRED_ACTIVITIES = {
     # name: exported value, or None when the attribute is not asserted
-    "what.thefcuk.pankxu.LaunchGateActivity": True,
-    "what.thefcuk.pankxu.PankxuLauncherActivity": False,
-    "com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity": False,
-    "com.google.androidbrowserhelper.trusted.ShortcutTrampolineActivity": True,
-    # S2-04 screens: in-app only, nothing outside may open them.
-    "what.thefcuk.pankxu.AboutActivity": False,
-    "what.thefcuk.pankxu.LicensesActivity": False,
+    "com.pankxu.arenacompanion.MainActivity": True,
 }
 
-FORBIDDEN_PERMISSIONS = {"android.permission.INTERNET"}
-REQUIRED_PERMISSIONS = {"android.permission.ACCESS_NETWORK_STATE"}
+FORBIDDEN_PERMISSIONS = set()
+REQUIRED_PERMISSIONS = {
+    "android.permission.ACCESS_NETWORK_STATE",
+    "android.permission.FOREGROUND_SERVICE",
+    "android.permission.INTERNET",
+    "android.permission.POST_NOTIFICATIONS",
+    "android.permission.RECORD_AUDIO",
+    "android.permission.USE_FINGERPRINT",
+    "android.permission.WAKE_LOCK",
+    "android.permission.RECEIVE_BOOT_COMPLETED",
+}
 
 
 def main(path):
