@@ -1,0 +1,64 @@
+name: CI
+on:
+  push: { branches: [companion, main] }
+  pull_request: { branches: [companion, main] }
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Locate the preinstalled Android SDK
+        run: |
+          set -euo pipefail
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "ANDROID_HOME=$SDK" >> "$GITHUB_ENV"
+          echo "ANDROID_SDK_ROOT=$SDK" >> "$GITHUB_ENV"
+          echo "$SDK/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
+          echo "$SDK/platform-tools" >> "$GITHUB_PATH"
+          echo "$SDK/build-tools/36.0.0" >> "$GITHUB_PATH"
+          echo "sdk root: $SDK"
+          ls "$SDK" 2>/dev/null || echo "no SDK dir at $SDK"
+
+      - name: Install pinned platform and build-tools
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses > /dev/null 2>&1 || true
+          sdkmanager --install "platforms;android-36" "build-tools;36.0.0" "platform-tools"
+          sdkmanager --list_installed 2>/dev/null | head -20
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      - name: Unit tests
+        run: ./gradlew --no-daemon --stacktrace :app:testDebugUnitTest
+
+      - name: Assemble debug
+        run: ./gradlew --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Guard - no analytics SDKs (R4)
+        run: |
+          set -e
+          if grep -rInE 'com\.google\.firebase|com\.amplitude|com\.mixpanel|io\.sentry|com\.flurry|com\.appsflyer|com\.adjust' app/src app/build.gradle.kts gradle/libs.versions.toml; then
+            echo "FORBIDDEN SDK"; exit 1
+          fi
+          echo "no analytics SDKs"
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: app-debug
+          path: app/build/outputs/apk/debug/*.apk
+          if-no-files-found: warn
