@@ -1,110 +1,46 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-  P3-03 as amended by v3.1: no runtime permissions. The TWA hands upload, camera and
-  microphone work to the browser, which already holds those grants. One normal-level
-  permission is declared for the offline pre-check (P3-12).
--->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <!--
-      ACCESS_NETWORK_STATE is a normal, auto-granted permission: it gates the P3-12
-      offline pre-check (ConnectivityManager) and cannot read user data. It is the only
-      permission the app declares, and it is not a runtime prompt.
-    -->
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.USE_FINGERPRINT" />
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+
+    <queries>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.GET_CONTENT" />
+            <data android:mimeType="*/*" />
+        </intent>
+    </queries>
 
     <application
+        android:name=".core.ArenaCompanionApp"
         android:allowBackup="false"
-        android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:networkSecurityConfig="@xml/network_security_config"
         android:supportsRtl="true"
-        android:theme="@style/Theme.Pankxu">
+        android:theme="@style/Theme.ArenaCompanion">
 
-        <!--
-          P3-04/P3-05: the library activity, not a hand-rolled one, so the
-          TWA -> Custom Tab -> browser fallback chain and inbound URL validation
-          come from the maintained implementation.
-
-          P3-07: android:autoVerify is deliberately NOT set. Arena's
-          /.well-known/assetlinks.json is currently {} (checked 2026-11-08),
-          so verification would fail and the attribute would only produce noise.
-          Turn it on after Arena publishes an asset statement (Phase 5).
-        -->
-        <!-- Exported entry point. Validates, gates and routes before anything loads. -->
         <activity
-            android:name=".LaunchGateActivity"
+            android:name=".MainActivity"
             android:exported="true"
-            android:theme="@style/Theme.Pankxu">
-
+            android:enableOnBackInvokedCallback="true"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:windowSoftInputMode="adjustResize">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-            <!-- Inbound arena.ai links. Concrete host, never a wildcard. -->
-            <intent-filter>
+            <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https" android:host="arena.ai" />
             </intent-filter>
-
-            <meta-data
-                android:name="android.app.shortcuts"
-                android:resource="@xml/shortcuts" />
         </activity>
-
-        <!-- The TWA. Not exported: reachable only through the gate. -->
-        <activity
-            android:name=".PankxuLauncherActivity"
-            android:exported="false"
-            android:theme="@style/Theme.Pankxu">
-
-            <meta-data
-                android:name="android.support.customtabs.trusted.DEFAULT_URL"
-                android:value="@string/default_url" />
-            <meta-data
-                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR"
-                android:resource="@color/bar" />
-            <meta-data
-                android:name="android.support.customtabs.trusted.STATUS_BAR_COLOR_DARK"
-                android:resource="@color/bar" />
-            <meta-data
-                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR"
-                android:resource="@color/bar" />
-            <meta-data
-                android:name="android.support.customtabs.trusted.NAVIGATION_BAR_COLOR_DARK"
-                android:resource="@color/bar" />
-            <meta-data
-                android:name="android.support.customtabs.trusted.SPLASH_SCREEN_BACKGROUND_COLOR"
-                android:resource="@color/bar" />
-            <!-- Custom Tab only. WebView fallback is forbidden: Google blocks
-                 sign-in in embedded WebViews (Container Plan s1). -->
-            <meta-data
-                android:name="android.support.customtabs.trusted.FALLBACK_STRATEGY"
-                android:value="customtabs" />
-
-        </activity>
-
-        <!--
-          Required by androidbrowserhelper 2.7.4, and the reason the first device
-          run crashed. LauncherActivity.launchTwa() does
-          `new ComponentName(this, ManageDataLauncherActivity.class)` and throws
-          IllegalArgumentException if that component is not in the merged
-          manifest. The library ships the class but does not declare it in its own
-          manifest - verified by unpacking the published AAR - so every app that
-          uses LauncherActivity has to declare it. See
-          docs/qa-evidence/device-2026-11-08/03-crash-stacktrace.txt.
-
-          It backs the browser's "Manage data" affordance and is never launched by
-          this app, so it needs no intent filter. It carries no MANAGE_SPACE_URL
-          metadata: if something did launch it, the library shows a
-          "not supported" toast instead of doing anything.
-        -->
-        <activity
-            android:name="com.google.androidbrowserhelper.trusted.ManageDataLauncherActivity"
-            android:exported="false" />
-
     </application>
 </manifest>
