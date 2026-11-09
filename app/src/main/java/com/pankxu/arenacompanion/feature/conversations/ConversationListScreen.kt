@@ -44,7 +44,7 @@ fun ConversationListScreen(
 
         if (conversations.isEmpty()) {
             EmptyState(
-                icon = Icons.Outlined.Chat,
+                icon = Icons.Outlined.Article,
                 title = "No conversations",
                 message = "Start a new conversation to see it here.",
             )

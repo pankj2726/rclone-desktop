@@ -5,11 +5,7 @@ import android.speech.tts.TextToSpeech
 import com.pankxu.arenacompanion.core.logging.Logger
 import java.util.Locale
 
-/**
- * Text-to-speech manager using Android's built-in TTS engine.
- * No backend API required — uses on-device TTS.
- */
-class TextToSpeechManager(context: Context) {
+class TextToSpeechManager(private val context: Context) {
 
     private val tag = "TTS"
     private var tts: TextToSpeech? = null

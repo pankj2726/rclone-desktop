@@ -47,7 +47,7 @@ class ToolRegistry {
 
     fun listTools(): List<ToolDefinition> = tools.values.toList()
 
-    fun execute(
+    suspend fun execute(
         toolId: String,
         parameters: Map<String, String>,
         executor: suspend (ToolDefinition, Map<String, String>) -> AppResult<String>,
@@ -57,7 +57,6 @@ class ToolRegistry {
 
         if (tool.requiresUserApproval) {
             Logger.w(tag, "Tool ${tool.name} requires user approval before execution")
-            // In a real implementation, this would prompt the user
         }
 
         return try {
