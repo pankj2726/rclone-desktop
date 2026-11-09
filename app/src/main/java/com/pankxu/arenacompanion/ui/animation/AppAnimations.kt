@@ -1,10 +1,12 @@
 package com.pankxu.arenacompanion.ui.animation
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -15,7 +17,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.TransformScope
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.LayoutCoordinates
 import androidx.compose.ui.layout.LayoutInfo
@@ -23,16 +24,16 @@ import androidx.compose.ui.unit.IntOffset
 
 /** Standard easing for app animations. */
 object AppEasing {
-    val Standard: Easing = Easing.bezier(0.2f, 0.0f, 0.0f, 1.0f)
-    val Emphasized: Easing = Easing.bezier(0.3f, 0.0f, 0.0f, 1.0f)
-    val Decelerate: Easing = Easing.bezier(0.0f, 0.0f, 0.2f, 1.0f)
+    val Standard: Easing = CubicBezierEasing(0.2f, 0.0f, 0.0f, 1.0f)
+    val Emphasized: Easing = CubicBezierEasing(0.3f, 0.0f, 0.0f, 1.0f)
+    val Decelerate: Easing = CubicBezierEasing(0.0f, 0.0f, 0.2f, 1.0f)
 }
 
 /** Spring animation configuration. */
 object AppSpring {
     val Standard = spring<Float>(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessMedium)
     val Gentle = spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessLow)
-    val Snappy = spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessMediumHigh)
+    val Snappy = spring<Float>(dampingRatio = Spring.DampingRatioNoBouncy, stiffness = Spring.StiffnessHigh)
 }
 
 /** Fade in animation for screen content. */
@@ -44,8 +45,8 @@ fun AnimatedFadeIn(
 ) {
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(durationMillis = duration),
-        exit = fadeOut(durationMillis = duration / 2),
+        enter = fadeIn(tween(duration)),
+        exit = fadeOut(tween(duration / 2)),
     ) { content() }
 }
 

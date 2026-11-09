@@ -3,6 +3,7 @@ package com.pankxu.arenacompanion.ui.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -70,8 +71,8 @@ private fun LogEntry(entry: Logger.LogEntry) {
 
     AnimatedVisibility(
         visible = true,
-        enter = fadeIn(durationMillis = 150),
-        exit = fadeOut(durationMillis = 150),
+        enter = fadeIn(tween(150)),
+        exit = fadeOut(tween(150)),
     ) {
         Row(
             Modifier.fillMaxWidth().padding(vertical = 2.dp),
