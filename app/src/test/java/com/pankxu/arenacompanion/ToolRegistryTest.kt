@@ -3,6 +3,7 @@ package com.pankxu.arenacompanion
 import com.pankxu.arenacompanion.core.utils.AppResult
 import com.pankxu.arenacompanion.domain.ToolDefinition
 import com.pankxu.arenacompanion.domain.ToolRegistry
+import kotlinx.coroutines.runBlocking
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -33,8 +34,10 @@ class ToolRegistryTest {
 
     @Test fun `execute registered tool succeeds`() {
         registry.register(ToolDefinition("t1", "Test Tool", "A test tool"))
-        val result = registry.execute("t1", emptyMap()) { _, _ ->
-            AppResult.Success("output")
+        val result = runBlocking {
+            registry.execute("t1", emptyMap()) { _, _ ->
+                AppResult.Success("output")
+            }
         }
         assertTrue(result.isSuccess())
         assertEquals("output", (result as AppResult.Success).data.output)
@@ -42,21 +45,27 @@ class ToolRegistryTest {
     }
 
     @Test fun `execute unregistered tool fails`() {
-        val result = registry.execute("nonexistent", emptyMap()) { _, _ ->
-            AppResult.Success("output")
+        val result = runBlocking {
+            registry.execute("nonexistent", emptyMap()) { _, _ ->
+                AppResult.Success("output")
+            }
         }
         assertTrue(result.isFailure())
     }
 
     @Test fun `execution history recorded`() {
         registry.register(ToolDefinition("t1", "Test Tool", "A test tool"))
-        registry.execute("t1", emptyMap()) { _, _ -> AppResult.Success("output") }
+        runBlocking {
+            registry.execute("t1", emptyMap()) { _, _ -> AppResult.Success("output") }
+        }
         assertEquals(1, registry.executionHistory.value.size)
     }
 
     @Test fun `clear history empties list`() {
         registry.register(ToolDefinition("t1", "Test Tool", "A test tool"))
-        registry.execute("t1", emptyMap()) { _, _ -> AppResult.Success("output") }
+        runBlocking {
+            registry.execute("t1", emptyMap()) { _, _ -> AppResult.Success("output") }
+        }
         registry.clearHistory()
         assertTrue(registry.executionHistory.value.isEmpty())
     }
